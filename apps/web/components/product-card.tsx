@@ -3,7 +3,7 @@
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
-import { SearchIcon } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import {
   Card,
@@ -23,7 +23,7 @@ export function ProductCard() {
     >
       <CardContent className="flex items-center justify-center"></CardContent>
       <CardFooter>
-        <Button><SearchIcon></SearchIcon></Button>
+        <Button className="rounded-full" size="icon"><ArrowRight></ArrowRight></Button>
       </CardFooter>
     </Card>
   );

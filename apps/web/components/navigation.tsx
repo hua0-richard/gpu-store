@@ -3,6 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { CircleCheckIcon, CircleHelpIcon, CircleIcon } from "lucide-react"
+import { robotoMono } from "@/app/fonts"
 
 // import { useIsMobile } from "@/hooks/use-mobile"
 import {
@@ -58,7 +59,7 @@ export function NavigationMenuDemo() {
     const isMobile = false
 
   return (
-    <NavigationMenu viewport={isMobile}>
+    <NavigationMenu viewport={isMobile} className={robotoMono.className}>
       <NavigationMenuList className="flex-wrap">
           <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
             <Link href="/">Home</Link>
