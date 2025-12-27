@@ -65,7 +65,6 @@ export function TableDemo() {
           <TableHead className="text-2xl my-8">VRAM</TableHead>
           <TableHead className="text-2xl">vCPU</TableHead>
           <TableHead className="text-2xl text-right">RAM</TableHead>
-          <TableHead className="text-2xl">Price</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -77,7 +76,6 @@ export function TableDemo() {
             <TableCell>{gpu.paymentStatus}</TableCell>
             <TableCell>{gpu.paymentMethod}</TableCell>
             <TableCell>{gpu.totalAmount}</TableCell>
-            <TableCell className="text-right">{gpu.totalAmount}</TableCell>
           </TableRow>
         ))}
       </TableBody>
