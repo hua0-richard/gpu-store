@@ -5,21 +5,26 @@ import { robotoMono } from "@/app/fonts";
 import { Button } from "@/components/ui/button";
 
 import { ShoppingBag } from "lucide-react";
+import { TableDemo } from "@/components/table";
+import { User } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-zinc-50 font-sans dark:bg-black overflow-y-hidden">
+    <div className="flex min-h-screen w-full items-center justify-center font-sans dark:bg-black">
       <main className="flex h-screen w-auto flex-col items-center justify-start bg-white dark:bg-black sm:items-start">
-        <div className="flex w-full items-center justify-between py-8 px-16">
+
+        <div className="flex w-full items-center justify-between py-8 px-16 mb-16">
           <NavigationMenuDemo></NavigationMenuDemo>
           <div className="flex gap-2">
-          <ModeToggle></ModeToggle>
-          <Button variant="outline"><ShoppingBag></ShoppingBag></Button>
+            <ModeToggle></ModeToggle>
+            <Button variant="outline"><ShoppingBag></ShoppingBag></Button>
+            <Button variant="outline"><User></User></Button>
           </div>
         </div>
-        <div className="px-16">
+
+        <div className="px-16 mb-16">
           <div className="max-w-5xl">
-            <h1 className="text-5xl md:text-6xl font-semibold tracking-tight leading-[1.05] text-foreground">
+            <h1 className="text-5xl md:text-6xl font-semibold tracking-tight leading-[1.05] text-foreground mb-16">
               <span className="font-bold">GPU</span>{" "}
               <span className="italic">Accelerated</span>{" "}
               <span className="font-semibold">
@@ -52,13 +57,16 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="w-full flex justify-start items-center gap-6 mt-10 px-16 pb-16">
-          <ProductCard computeProvider="NVIDIA" imgResource="nvidia.jpg"></ProductCard>
-          <ProductCard computeProvider="AMD" imgResource="amd.webp"></ProductCard>
+        <div className="w-full flex justify-start items-center gap-6 mt-10 px-16 pb-16 mb-16">
+          <ProductCard computeProvider="NVIDIA" imgResource="nvidia.png"></ProductCard>
+          <ProductCard computeProvider="AMD" imgResource="amd.png"></ProductCard>
         </div>
 
-        <div className="w-full flex justify-start items-center px-16">
+        <div className="w-full flex justify-start items-center px-16 mb-16">
           <h1 className="font-semibold text-5xl">Pricing</h1>
+        </div>
+        <div className="w-full flex justify-start items-center px-16">
+          <TableDemo></TableDemo>
         </div>
       </main>
     </div>
