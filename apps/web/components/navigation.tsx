@@ -30,7 +30,7 @@ export function NavigationMenuDemo() {
         <NavigationMenuItem className="hidden md:block">
           <NavigationMenuTrigger>AMD</NavigationMenuTrigger>
           <NavigationMenuContent>
-            <ul className="grid w-[300px] gap-4">
+            <ul className="grid w-[150px] gap-4">
               <li>
                 <NavigationMenuLink asChild>
                   <Link href="#">
@@ -54,8 +54,10 @@ export function NavigationMenuDemo() {
                 </NavigationMenuLink>
                 <NavigationMenuLink asChild>
                   <Link href="#">
-                    <div className="font-medium">View All</div>
-                    <ArrowRight></ArrowRight>
+                    <div className="flex justify-between ">
+                      <div className="font-medium">View All</div>
+                      <ArrowRight></ArrowRight>
+                    </div>
                   </Link>
                 </NavigationMenuLink>
               </li>
@@ -65,7 +67,7 @@ export function NavigationMenuDemo() {
         <NavigationMenuItem className="hidden md:block">
           <NavigationMenuTrigger>NVIDIA</NavigationMenuTrigger>
           <NavigationMenuContent>
-            <ul className="grid w-[300px] gap-4">
+            <ul className="grid w-[150px] gap-4">
               <li>
                 <NavigationMenuLink asChild>
                   <Link href="#">
@@ -84,8 +86,10 @@ export function NavigationMenuDemo() {
                 </NavigationMenuLink>
                 <NavigationMenuLink asChild>
                   <Link href="#">
-                    <div className="font-medium">View All</div>
-                    <ArrowRight></ArrowRight>
+                    <div className="flex justify-between ">
+                      <div className="font-medium">View All</div>
+                      <ArrowRight></ArrowRight>
+                    </div>
                   </Link>
                 </NavigationMenuLink>
               </li>

@@ -8,7 +8,7 @@ import { ShoppingBag } from "lucide-react";
 import { TableDemo } from "@/components/table";
 import { User } from "lucide-react";
 import { ArrowRight } from "lucide-react";
-import { Arrow } from "@radix-ui/react-dropdown-menu";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -21,8 +21,10 @@ export default function Home() {
             <Button variant="outline">
               <ShoppingBag></ShoppingBag>
             </Button>
-            <Button variant="outline">
-              <User></User>
+            <Button variant="outline" asChild>
+              <Link href="/login">
+                <User></User>
+              </Link>
             </Button>
           </div>
         </div>
@@ -76,9 +78,11 @@ export default function Home() {
         <div className="w-full flex justify-start items-center px-16 mb-16">
           <h1 className="font-semibold text-5xl">Pricing</h1>
         </div>
+
         <div className="w-full flex justify-start items-center px-16 mb-16">
           <TableDemo></TableDemo>
         </div>
+
         <div className="w-full px-14 flex justify-start items-center bg-secondary mb-16">
           <div className="w-full h-full py-24">
             <div className="w-1/2 flex flex-row items-center justify-between w-full">
@@ -116,8 +120,24 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div>
-          <h1>Footer</h1>
+
+        <div
+          className={`w-full flex justify-start gap-8 items-start px-16 py-16 text-sm ${robotoMono.className}`}
+        >
+          <div className="w-[400px] flex flex-col gap-2">
+            <h1 className="px-2 py-2 font-semibold">About</h1>
+            <hr className="border-border"></hr>
+            <div className="px-2 py-2 hover:bg-primary hover:text-secondary">Discover</div>
+            <div className="px-2 py-2 hover:bg-primary hover:text-secondary">About</div>
+            <div className="px-2 py-2 hover:bg-primary hover:text-secondary">Company</div>
+          </div>
+
+          <div className="w-[400px] flex flex-col gap-2">
+            <h1 className="px-2 py-2 font-semibold">Product</h1>
+            <hr className="border-border"></hr>
+            <div className="px-2 py-2 hover:bg-primary hover:text-secondary">Disclaimer</div>
+          </div>
+
         </div>
       </main>
     </div>

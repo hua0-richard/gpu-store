@@ -13,44 +13,44 @@ import {
 
 const gpus = [
   {
-    gpu: "INV001",
-    paymentStatus: "Paid",
+    gpu: "NVIDIA A100",
+    vram: "24 GB",
     totalAmount: "$250.00",
     paymentMethod: "Credit Card",
   },
   {
-    gpu: "INV002",
-    paymentStatus: "Pending",
+    gpu: "NVIDIA H100",
+    vram: "24 GB",
     totalAmount: "$150.00",
     paymentMethod: "PayPal",
   },
   {
-    gpu: "INV003",
-    paymentStatus: "Unpaid",
+    gpu: "NVIDIA H200",
+    vram: "24 GB",
     totalAmount: "$350.00",
     paymentMethod: "Bank Transfer",
   },
   {
-    gpu: "INV004",
-    paymentStatus: "Paid",
+    gpu: "AMD MI300X",
+    vram: "24 GB",
     totalAmount: "$450.00",
     paymentMethod: "Credit Card",
   },
   {
-    gpu: "INV005",
-    paymentStatus: "Paid",
+    gpu: "AMD MI325X",
+    vram: "24 GB",
     totalAmount: "$550.00",
     paymentMethod: "PayPal",
   },
   {
-    invoice: "INV006",
-    paymentStatus: "Pending",
+    gpu: "AMD MI355X",
+    vram: "24 GB",
     totalAmount: "$200.00",
     paymentMethod: "Bank Transfer",
   },
   {
-    gpu: "INV007",
-    paymentStatus: "Unpaid",
+    gpu: "AMD MI250X",
+    vram: "24 GB",
     totalAmount: "$300.00",
     paymentMethod: "Credit Card",
   },
@@ -61,10 +61,11 @@ export function TableDemo() {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[100px] font-xl"></TableHead>
+          <TableHead className="font-xl"></TableHead>
           <TableHead className="text-2xl my-8">VRAM</TableHead>
           <TableHead className="text-2xl">vCPU</TableHead>
-          <TableHead className="text-2xl text-right">RAM</TableHead>
+          <TableHead className="text-2xl">RAM</TableHead>
+          <TableHead className="text-2xl">Price</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -73,7 +74,7 @@ export function TableDemo() {
             <TableCell className="text-2xl font-semibold py-8 w-[200px]">
               {gpu.gpu}
             </TableCell>
-            <TableCell>{gpu.paymentStatus}</TableCell>
+            <TableCell>{gpu.vram}</TableCell>
             <TableCell>{gpu.paymentMethod}</TableCell>
             <TableCell>{gpu.totalAmount}</TableCell>
           </TableRow>
