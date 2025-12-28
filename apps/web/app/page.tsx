@@ -1,6 +1,6 @@
 import { ModeToggle } from "@/components/theme-toggle";
 import { ProductCard } from "@/components/product-card";
-import { NavigationMenuDemo } from "@/components/navigation";
+import { Navigation } from "@/components/navigation";
 import { robotoMono } from "@/app/fonts";
 import { Button } from "@/components/ui/button";
 
@@ -15,7 +15,7 @@ export default function Home() {
     <div className="flex min-h-screen w-full items-center justify-center font-sans dark:bg-black">
       <main className="flex h-screen w-auto flex-col items-center justify-start bg-white dark:bg-black sm:items-start">
         <div className="flex w-full items-center justify-between py-8 px-16 mb-16">
-          <NavigationMenuDemo></NavigationMenuDemo>
+          <Navigation></Navigation>
           <div className="flex gap-2">
             <ModeToggle></ModeToggle>
             <Button variant="outline">

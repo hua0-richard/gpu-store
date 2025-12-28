@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/navigation-menu";
 
 
-export function NavigationMenuDemo() {
+export function Navigation() {
   //  const isMobile = useIsMobile()
   const isMobile = false;
 
