@@ -1,5 +1,26 @@
 version: "3.9"
 services:
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./apps/web:/app
+      - /app/node_modules
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      CORS_ORIGIN: "http://localhost:3000"
+  
   postgres:
     image: postgres:15
     ports:
@@ -12,3 +33,4 @@ services:
     image: redis:7
     ports:
       - "6379:6379"
+    
