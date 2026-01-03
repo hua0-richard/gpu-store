@@ -1,37 +1,18 @@
-import { ModeToggle } from "@/components/theme-toggle";
 import { ProductCard } from "@/components/product-card";
-import { Navigation } from "@/components/navigation";
 import { robotoMono } from "@/app/fonts";
 import { Button } from "@/components/ui/button";
-
-import { ShoppingBag } from "lucide-react";
 import { TableDemo } from "@/components/table";
-import { User } from "lucide-react";
 import { ArrowRight } from "lucide-react";
-import Link from "next/link";
 import Footer from "@/components/footer";
+import NavigationBar from "@/components/navigation-bar";
 
 export default function Home() {
   return (
     <div className="flex min-h-screen w-full items-center justify-center font-sans dark:bg-black">
       <main className="flex h-screen max-w-7xl flex-col items-center justify-start bg-white dark:bg-black sm:items-start">
-        <div className="flex w-full justify-between py-8 mb-16">
-          <Navigation></Navigation>
-          <div className="flex gap-2">
-            <ModeToggle></ModeToggle>
-            <Button variant="outline">
-              <ShoppingBag></ShoppingBag>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link href="/login">
-                <User></User>
-              </Link>
-            </Button>
-          </div>
-        </div>
-
-        <div className="px-16 mb-16">
-          <div className="max-w-5xl">
+        <NavigationBar></NavigationBar>
+        <div className="mb-16">
+          <div className="max-w-7xl">
             <h1 className="text-5xl md:text-6xl font-semibold tracking-tight leading-[1.05] text-foreground mb-16">
               <span className="font-bold">GPU</span>{" "}
               <span className="italic">Accelerated</span>{" "}
@@ -39,7 +20,6 @@ export default function Home() {
                 infrastructure for training, inference, and scale.
               </span>
             </h1>
-
             <p
               className={`mt-6 max-w-2xl text-lg leading-relaxed text-gray-500 dark:text-gray-400 ${robotoMono.className}`}
             >
@@ -65,7 +45,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="w-full flex justify-start items-center gap-6 mt-10 px-16 pb-16 mb-16">
+        <div className="w-full flex justify-start items-center gap-6 mt-10 pb-16 mb-16">
           <ProductCard
             computeProvider="NVIDIA"
             imgResource="nvidia.png"
@@ -76,11 +56,11 @@ export default function Home() {
           ></ProductCard>
         </div>
 
-        <div className="w-full flex justify-start items-center px-16 mb-16">
+        <div className="w-full flex justify-start items-center mb-16">
           <h1 className="font-semibold text-5xl">Pricing</h1>
         </div>
 
-        <div className="w-full flex justify-start items-center px-16 mb-16">
+        <div className="w-full flex justify-start items-center mb-16">
           <TableDemo></TableDemo>
         </div>
 

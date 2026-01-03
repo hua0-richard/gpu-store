@@ -1,22 +1,22 @@
 import { Card, CardContent, CardDescription, CardFooter, CardTitle } from "@/components/ui/card";
 import { useCatalogData } from "../_hooks/useCatalogData";
-import { Navigation } from "@/components/navigation";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Footer from "@/components/footer";
+import NavigationBar from "@/components/navigation-bar";
 
 // app/pricing/page.tsx
 export default function PricingPage() {
   const gpus = useCatalogData().gpuData.amd;
   return <div className="flex justify-center items-center w-full px-16">
     <main className="flex max-w-7xl flex-col items-start justify-start bg-white dark:bg-black">
-      <div>
-        <Navigation></Navigation>
+      <div className="w-full">
+        <NavigationBar></NavigationBar>
       </div>
-      <h1 className="py-16 text-7xl">Select GPU</h1>
+      <h1 className="font-semibold text-5xl pb-16">Select GPU</h1>
       <div className="flex flex-wrap gap-8">
         {Object.values(gpus).map((gpu) => (
-        <Card key={gpu.name} className="max-w-lg px-8">
+        <Card key={gpu.name} className="max-w-sm px-8">
           <CardTitle className="font-mono text-xl">{gpu.name}</CardTitle>
           <CardDescription>
             Choose the plan that best fits your needs.
