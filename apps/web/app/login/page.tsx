@@ -1,5 +1,3 @@
-import { NavigationMenuDemo } from "@/components/navigation";
-import { ModeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import {
   Card,
