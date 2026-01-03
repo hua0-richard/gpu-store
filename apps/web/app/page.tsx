@@ -13,7 +13,7 @@ export default function Home() {
         <NavigationBar></NavigationBar>
         <div className="mb-16">
           <div className="max-w-7xl">
-            <h1 className="text-5xl md:text-6xl font-semibold tracking-tight leading-[1.05] text-foreground mb-16">
+            <h1 className="text-7xl font-semibold tracking-tight leading-[1.05] text-foreground mb-16">
               <span className="font-bold">GPU</span>{" "}
               <span className="italic">Accelerated</span>{" "}
               <span className="font-semibold">
