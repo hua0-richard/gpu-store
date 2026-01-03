@@ -11,6 +11,7 @@ export default function Home() {
     <div className="flex min-h-screen w-full items-center justify-center font-sans dark:bg-black">
       <main className="flex h-screen max-w-7xl flex-col items-center justify-start bg-white dark:bg-black sm:items-start">
         <NavigationBar></NavigationBar>
+        
         <div className="mb-16">
           <div className="max-w-7xl">
             <h1 className="text-7xl font-semibold tracking-tight leading-[1.05] text-foreground mb-16">
@@ -21,7 +22,7 @@ export default function Home() {
               </span>
             </h1>
             <p
-              className={`mt-6 max-w-2xl text-lg leading-relaxed text-gray-500 dark:text-gray-400 ${robotoMono.className}`}
+              className={`max-w-2xl text-lg leading-relaxed text-gray-500 dark:text-gray-400 mb-16 ${robotoMono.className}`}
             >
               Accelerate{" "}
               <span className="font-medium text-foreground">

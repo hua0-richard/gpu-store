@@ -24,8 +24,7 @@ export function ProductCard({ imgResource, computeProvider }: navigationProps) {
     transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]
     hover:-translate-y-1 hover:shadow-md
 
-    w-[400px] h-[280px]
-    md:w-[500px] md:h-[340px]
+    w-1/2 h-auto
 
     bg-cover bg-center
   "
