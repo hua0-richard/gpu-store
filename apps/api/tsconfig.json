@@ -1,12 +1,10 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
+    "module": "commonjs",
     "moduleResolution": "node",
     "target": "ES2023",
     "strict": true,
     "esModuleInterop": true,
-    "resolvePackageJsonExports": true,
-    "ignoreDeprecations": "6.0",
     "isolatedModules": true,
     "declaration": true,
     "removeComments": true,
