@@ -17,6 +17,7 @@ export class UsersService {
     },
   ];
 
+  // eslint-disable-next-line @typescript-eslint/require-await, @typescript-eslint/no-redundant-type-constituents
   async findOne(username: string): Promise<User | undefined> {
     return this.users.find((user) => user.username === username);
   }
