@@ -12,14 +12,18 @@ services:
 
   api:
     build:
-      context: ./apps/api
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: apps/api/Dockerfile
     ports:
       - "3001:3001"
+    volumes:
+      - ./apps/api:/app
+      - /app/node_modules
     environment:
       NODE_ENV: development
       PORT: 3001
       CORS_ORIGIN: "http://localhost:3000"
+      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/ecommerce"
   
   postgres:
     image: postgres:15
