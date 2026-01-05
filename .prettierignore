@@ -1,0 +1,20 @@
+# Package Managers
+node_modules
+pnpm-lock.yaml
+
+# Build Outputs
+dist
+build
+out
+.next
+.nuxt
+coverage
+
+# Generated Files
+generated
+prisma/client
+*.log
+
+# Temp
+.DS_Store
+.env*

@@ -14,7 +14,7 @@ async function main() {
             title: `Post ${j + 1} by User ${userIndex}`,
             content: `This is post ${j + 1} written by user ${userIndex}.`,
             published: Math.random() > 0.3,
-          })
+          }),
         ),
       },
     };

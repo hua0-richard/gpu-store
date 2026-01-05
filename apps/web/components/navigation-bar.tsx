@@ -15,8 +15,8 @@ import { useEffect } from "react";
 export default function NavigationBar() {
   const setAuthenticated = useSetAuthenticated();
   useEffect(() => {
-    getAuth(setAuthenticated)
-  }, [])
+    getAuth(setAuthenticated);
+  }, []);
   return (
     <div className="flex w-full justify-between py-8 mb-16">
       <Navigation></Navigation>
@@ -30,9 +30,7 @@ export default function NavigationBar() {
             <User></User>
           </Link>
         </Button>
-        <Button onClick={() => getAuth(setAuthenticated)}>
-          Click Me!
-        </Button>
+        <Button onClick={() => getAuth(setAuthenticated)}>Click Me!</Button>
       </div>
     </div>
   );

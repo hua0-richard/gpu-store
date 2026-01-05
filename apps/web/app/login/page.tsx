@@ -18,14 +18,14 @@ import {
   getAuth,
   useAuthenticated,
   useSetAuthenticated,
-  login
+  login,
 } from "@/components/auth-context";
 
 export default function Login() {
   const router = useRouter();
   const [user, setUser] = useState("");
   const [secret, setSecret] = useState("");
-  const authenticated = useSetAuthenticated(); 
+  const authenticated = useSetAuthenticated();
 
   return (
     <div className="flex flex-col h-screen">
@@ -74,12 +74,16 @@ export default function Login() {
             </form>
           </CardContent>
           <CardFooter className="flex-col gap-2">
-            <Button type="submit" className="w-full" onClick = {async () => {
-              const success = await login(authenticated, user, secret) 
-              if (success) {
-                router.push("/")
-              }
-            }}>
+            <Button
+              type="submit"
+              className="w-full"
+              onClick={async () => {
+                const success = await login(authenticated, user, secret);
+                if (success) {
+                  router.push("/");
+                }
+              }}
+            >
               Login
             </Button>
             <Button variant="outline" className="w-full">

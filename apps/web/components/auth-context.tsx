@@ -25,7 +25,8 @@ export function useAuthenticated() {
 
 export function useSetAuthenticated() {
   const setter = useContext(SetAuthenticatedContext);
-  if (!setter) throw new Error("useSetAuthenticated must be used in <AuthProvider />");
+  if (!setter)
+    throw new Error("useSetAuthenticated must be used in <AuthProvider />");
   return setter;
 }
 
@@ -47,7 +48,11 @@ export async function getAuth(setAuthenticated: (v: boolean) => void) {
   }
 }
 
-export async function login(setAuthenticated: (v: boolean) => void, user: string, secret: string) {
+export async function login(
+  setAuthenticated: (v: boolean) => void,
+  user: string,
+  secret: string,
+) {
   const res = await fetch("http://localhost:3001/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -60,9 +65,9 @@ export async function login(setAuthenticated: (v: boolean) => void, user: string
   if (res.ok) {
     console.log("found user");
     setAuthenticated(true);
-    return true
+    return true;
   } else {
     setAuthenticated(false);
   }
-  return false
+  return false;
 }

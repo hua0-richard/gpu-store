@@ -24,7 +24,7 @@ services:
       PORT: 3001
       CORS_ORIGIN: "http://localhost:3000"
       DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/ecommerce"
-  
+
   postgres:
     image: postgres:15
     ports:
@@ -37,4 +37,3 @@ services:
     image: redis:7
     ports:
       - "6379:6379"
-    
