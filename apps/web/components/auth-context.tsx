@@ -46,3 +46,23 @@ export async function getAuth(setAuthenticated: (v: boolean) => void) {
     setAuthenticated(false);
   }
 }
+
+export async function login(setAuthenticated: (v: boolean) => void, user: string, secret: string) {
+  const res = await fetch("http://localhost:3001/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      username: user,
+      password: secret,
+    }),
+  });
+
+  if (res.ok) {
+    console.log("found user");
+    setAuthenticated(true);
+    return true
+  } else {
+    setAuthenticated(false);
+  }
+  return false
+}

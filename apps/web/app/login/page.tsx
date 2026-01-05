@@ -1,4 +1,7 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardAction,
@@ -10,8 +13,20 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useState } from "react";
+import {
+  getAuth,
+  useAuthenticated,
+  useSetAuthenticated,
+  login
+} from "@/components/auth-context";
 
 export default function Login() {
+  const router = useRouter();
+  const [user, setUser] = useState("");
+  const [secret, setSecret] = useState("");
+  const authenticated = useSetAuthenticated(); 
+
   return (
     <div className="flex flex-col h-screen">
       <div className="w-screen h-full flex items-center justify-center bg-background">
@@ -35,6 +50,7 @@ export default function Login() {
                     type="email"
                     placeholder="m@example.com"
                     required
+                    onChange={(e) => setUser(e.target.value)}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -47,13 +63,23 @@ export default function Login() {
                       Forgot your password?
                     </a>
                   </div>
-                  <Input id="password" type="password" required />
+                  <Input
+                    id="password"
+                    type="password"
+                    required
+                    onChange={(e) => setSecret(e.target.value)}
+                  />
                 </div>
               </div>
             </form>
           </CardContent>
           <CardFooter className="flex-col gap-2">
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" onClick = {async () => {
+              const success = await login(authenticated, user, secret) 
+              if (success) {
+                router.push("/")
+              }
+            }}>
               Login
             </Button>
             <Button variant="outline" className="w-full">
