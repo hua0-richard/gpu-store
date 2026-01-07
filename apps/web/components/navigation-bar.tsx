@@ -1,4 +1,5 @@
 "use client";
+
 import { Navigation } from "@/components/navigation";
 import { Button } from "@/components/ui/button";
 import { ShoppingBag, User } from "lucide-react";
@@ -30,7 +31,6 @@ export default function NavigationBar() {
             <User></User>
           </Link>
         </Button>
-        <Button onClick={() => getAuth(setAuthenticated)}>Click Me!</Button>
       </div>
     </div>
   );

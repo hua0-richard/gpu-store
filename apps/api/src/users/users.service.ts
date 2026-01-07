@@ -1,24 +1,21 @@
 import { Injectable } from '@nestjs/common';
-
-export type User = any;
+import { prisma } from '../../lib/prisma';
+import { User } from 'generated/prisma/client';
+import bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
-  private readonly users = [
-    {
-      userId: 1,
-      username: 'john',
-      password: 'changeme',
-    },
-    {
-      userId: 2,
-      username: 'maria',
-      password: 'guess',
-    },
-  ];
-
-  // eslint-disable-next-line @typescript-eslint/require-await, @typescript-eslint/no-redundant-type-constituents
-  async findOne(username: string): Promise<User | undefined> {
-    return this.users.find((user) => user.username === username);
+  async findOne(email: string, password: string): Promise<User | undefined> {
+    const user = await prisma.user.findFirst({
+      where: { email: email },
+    });
+    if (!user) {
+      return undefined;
+    }
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) {
+      return undefined;
+    }
+    return user;
   }
 }
