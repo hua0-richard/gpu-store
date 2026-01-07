@@ -2,7 +2,17 @@
 
 ## Architecture
 
+Authentication is handled using `bcrypt` and a JWT Token. 
+
 ## Tech Stack
+Next.js 
+Shadcn 
+
+NestJS
+Prisma
+Postgres
+Stripe Payments
+Redis Caching
 
 ## Features
 
@@ -15,6 +25,9 @@
 
 To view the contents of the database
 `pnpm prisma studio`
+
+To reset the database
+`pnpm prisma migrate reset`
 
 ## Background Jobs
 
