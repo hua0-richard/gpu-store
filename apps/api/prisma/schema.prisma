@@ -12,4 +12,6 @@ model User {
   email String  @unique
   password String
   name  String?
+  compute String?
+  cart String?
 }
