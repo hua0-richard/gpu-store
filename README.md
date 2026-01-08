@@ -34,5 +34,8 @@ To reset the database
 ## Stripe Webhooks
 
 ## Deployment
+Frontend is deployed on vercel
+Server is deployed on Azure
+Database is managed using Prisma
 
 ## Testing
