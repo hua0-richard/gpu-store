@@ -7,17 +7,11 @@ import Link from "next/link";
 import { ModeToggle } from "@/components/theme-toggle";
 
 import {
-  getAuth,
-  useAuthenticated,
-  useSetAuthenticated,
+  useAuth,
 } from "@/components/auth-context";
-import { useEffect } from "react";
 
 export default function NavigationBar() {
-  const setAuthenticated = useSetAuthenticated();
-  useEffect(() => {
-    getAuth(setAuthenticated);
-  }, []);
+  const { isAuthenticated, user } = useAuth();
   return (
     <div className="flex w-full justify-between py-8 mb-16">
       <Navigation></Navigation>
@@ -27,9 +21,11 @@ export default function NavigationBar() {
           <ShoppingBag></ShoppingBag>
         </Button>
         <Button variant="outline" asChild>
-          <Link href="/login">
-            <User></User>
-          </Link>
+          {isAuthenticated ?
+            <Link href="/login">
+              <User className="mr-2" />
+              {user?.username}
+            </Link> : <Link href="/login">Log in</Link>}
         </Button>
       </div>
     </div>

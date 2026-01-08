@@ -2,58 +2,71 @@
 
 import { createContext, useContext, useState } from "react";
 
-const AuthenticatedContext = createContext(false);
-const SetAuthenticatedContext = createContext<React.Dispatch<
-  React.SetStateAction<boolean>
+export interface User {
+  username: string;
+  password?: string;
+}
+
+interface AuthState {
+  isAuthenticated: boolean;
+  user: User | null;
+}
+
+const AuthContext = createContext<AuthState>({
+  isAuthenticated: false,
+  user: null,
+});
+
+const SetAuthContext = createContext<React.Dispatch<
+  React.SetStateAction<AuthState>
 > | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [authenticated, setAuthenticated] = useState(false);
+  const [authState, setAuthState] = useState<AuthState>({
+    isAuthenticated: false,
+    user: null,
+  });
 
   return (
-    <AuthenticatedContext.Provider value={authenticated}>
-      <SetAuthenticatedContext.Provider value={setAuthenticated}>
+    <AuthContext.Provider value={authState}>
+      <SetAuthContext.Provider value={setAuthState}>
         {children}
-      </SetAuthenticatedContext.Provider>
-    </AuthenticatedContext.Provider>
+      </SetAuthContext.Provider>
+    </AuthContext.Provider>
   );
 }
 
-export function useAuthenticated() {
-  return useContext(AuthenticatedContext);
+export function useAuth() {
+  return useContext(AuthContext);
 }
 
-export function useSetAuthenticated() {
-  const setter = useContext(SetAuthenticatedContext);
-  if (!setter)
-    throw new Error("useSetAuthenticated must be used in <AuthProvider />");
+// Deprecated: maintained for some compatibility if possible, but behavior changes
+export function useAuthenticated() {
+  const { isAuthenticated } = useContext(AuthContext);
+  return isAuthenticated;
+}
+
+export function useSetAuth() {
+  const setter = useContext(SetAuthContext);
+  if (!setter) throw new Error("useSetAuth must be used in <AuthProvider />");
   return setter;
 }
 
-export async function getAuth(setAuthenticated: (v: boolean) => void) {
-  const res = await fetch("http://localhost:3001/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      username: "john",
-      password: "changeme",
-    }),
-  });
-
-  if (res.ok) {
-    console.log("found user");
-    setAuthenticated(true);
-  } else {
-    setAuthenticated(false);
-  }
+export function useSetAuthenticated() {
+  // This is a compatibility wrapper or we might need to change callsites completely.
+  // Since we are updating all call sites, let's just expose the new setter or
+  // adapt this one to throw an error if used incorrectly, or return the new setter.
+  // However, the signature of the setter has changed.
+  // I will update this to return the new setter but consumers need updates.
+  return useSetAuth();
 }
 
 export async function login(
-  setAuthenticated: (v: boolean) => void,
+  setAuth: React.Dispatch<React.SetStateAction<AuthState>>,
   user: string,
   secret: string,
 ) {
-  const res = await fetch("http://localhost:3001/auth/login", {
+  const res = await fetch('/api/auth/login', {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -64,10 +77,16 @@ export async function login(
 
   if (res.ok) {
     console.log("found user");
-    setAuthenticated(true);
+    setAuth({
+      isAuthenticated: true,
+      user: { username: user },
+    });
     return true;
   } else {
-    setAuthenticated(false);
+    setAuth({
+      isAuthenticated: false,
+      user: null,
+    });
   }
   return false;
 }

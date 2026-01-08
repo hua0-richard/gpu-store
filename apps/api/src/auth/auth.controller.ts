@@ -22,7 +22,7 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Post('create')
+  @Post('signup')
   create(@Body() newUser: Record<string, any>) {
     return this.authService.createUser(newUser.email, newUser.password, newUser.name);
   }

@@ -15,9 +15,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import {
-  getAuth,
   useAuthenticated,
-  useSetAuthenticated,
+  useSetAuth,
   login,
 } from "@/components/auth-context";
 
@@ -25,7 +24,7 @@ export default function Login() {
   const router = useRouter();
   const [user, setUser] = useState("");
   const [secret, setSecret] = useState("");
-  const authenticated = useSetAuthenticated();
+  const setAuth = useSetAuth();
 
   return (
     <div className="flex flex-col h-screen">
@@ -78,7 +77,7 @@ export default function Login() {
               type="submit"
               className="w-full"
               onClick={async () => {
-                const success = await login(authenticated, user, secret);
+                const success = await login(setAuth, user, secret);
                 if (success) {
                   router.push("/");
                 }
