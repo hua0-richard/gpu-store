@@ -19,15 +19,15 @@ Redis Caching
 ## Local Development
 
 ### Database
-1. `pnpm prisma:generate`
-2. `pnpm prisma:migrate`
-3. `pnpm db:populate`
+1. `docker exec -it api pnpm prisma:generate`
+2. `docker exec -it api pnpm prisma:migrate`
+3. `docker exec -it api pnpm db:populate`
 
 To view the contents of the database
-`pnpm prisma studio`
+`DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ecommerce pnpm prisma studio`
 
 To reset the database
-`pnpm prisma migrate reset`
+`docker exec -it api pnpm prisma migrate reset`
 
 ## Background Jobs
 
