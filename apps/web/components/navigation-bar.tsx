@@ -9,6 +9,7 @@ import { ModeToggle } from "@/components/theme-toggle";
 import {
   useAuth,
 } from "@/components/auth-context";
+import { useEffect } from "react";
 
 export default function NavigationBar() {
   const { isAuthenticated, user } = useAuth();
@@ -24,7 +25,7 @@ export default function NavigationBar() {
           {isAuthenticated ?
             <Link href="/login">
               <User className="mr-2" />
-              {user?.username}
+              {user?.email}
             </Link> : <Link href="/login">Log in</Link>}
         </Button>
       </div>

@@ -6,9 +6,10 @@ import {
   useEffect,
   useState,
 } from "react";
+import { usePathname } from "next/navigation";
 
 export interface User {
-  username: string;
+  email: string;
 }
 
 interface AuthState {
@@ -28,12 +29,14 @@ const SetAuthContext = createContext<
 >(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
   const [authState, setAuthState] = useState<AuthState>({
     isAuthenticated: false,
     user: null,
     loading: true,
   });
 
+  // added pathname as dep
   useEffect(() => {
     async function checkAuth() {
       try {
@@ -66,9 +69,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
       }
     }
-
     checkAuth();
-  }, []);
+  }, [pathname]);
 
   return (
     <AuthContext.Provider value={authState}>

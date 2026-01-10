@@ -1,3 +1,4 @@
+"use client"
 import { ProductCard } from "@/components/product-card";
 import { robotoMono } from "@/app/fonts";
 import { Button } from "@/components/ui/button";
@@ -5,8 +6,12 @@ import { TableDemo } from "@/components/table";
 import { ArrowRight } from "lucide-react";
 import Footer from "@/components/footer";
 import NavigationBar from "@/components/navigation-bar";
+import { useEffect } from "react";
 
 export default function Home() {
+  useEffect(() => {
+    console.log("here")
+  })
   return (
     <div className="flex min-h-screen w-full items-center justify-center font-sans dark:bg-black">
       <main className="flex h-screen max-w-7xl flex-col items-center justify-start bg-white dark:bg-black sm:items-start">

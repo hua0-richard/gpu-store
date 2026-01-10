@@ -9,9 +9,20 @@ datasource db {
 
 model User {
   id    Int     @id @default(autoincrement())
+  session_id String?
   email String  @unique
   password String
   name  String?
   compute String?
   cart String?
+}
+
+model Cart {
+  id    Int     @id @default(autoincrement())
+  user_id Int
+}
+
+model Compute {
+  id    Int     @id @default(autoincrement())
+  user_id Int
 }

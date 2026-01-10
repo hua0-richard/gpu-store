@@ -1,5 +1,5 @@
 "use server";
-
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -29,7 +29,7 @@ export async function submitLogin(formData: FormData) {
     try {
       const err = await res.json();
       msg = err?.message ?? msg;
-    } catch {}
+    } catch { }
     throw new Error(msg);
   }
 
@@ -40,13 +40,12 @@ export async function submitLogin(formData: FormData) {
     throw new Error("No token returned from server");
   }
 
-(await cookies()).set("session", token, {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "lax",
-  path: "/",          // allow all routes including /api/*
-  maxAge: 60 * 5,     // 5 minutes
-});
-
-  redirect("/");
+  (await cookies()).set("session", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",          // allow all routes including /api/*
+    maxAge: 60 * 5,     // 5 minutes
+  });
+  redirect("/")
 }
