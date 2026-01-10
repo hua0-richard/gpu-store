@@ -26,7 +26,8 @@
     "dev:web": "pnpm --filter web dev",
     "db:push": "pnpm prisma db push",
     "db:studio": "pnpm prisma studio",
-    "db:populate": "pnpm tsx script.ts"
+    "db:populate": "pnpm tsx script.ts",
+    "db:seed:dev": "docker exec -it api pnpm prisma:generate && docker exec -it api pnpm prisma:migrate && docker exec -it api pnpm db:populate"
   },
   "dependencies": {
     "@nestjs/bullmq": "^11.0.4",
@@ -40,6 +41,7 @@
     "@prisma/client": "^7.2.0",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.66.4",
+    "cookie-parser": "^1.4.7",
     "dotenv": "^17.2.3",
     "ioredis": "^5.8.2",
     "nodemailer": "^7.0.12",
@@ -55,6 +57,7 @@
     "@nestjs/cli": "^11.0.14",
     "@nestjs/schematics": "^11.0.9",
     "@nestjs/testing": "^11.1.11",
+    "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
     "@types/node": "^22.19.3",

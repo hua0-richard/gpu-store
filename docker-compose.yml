@@ -13,6 +13,7 @@ services:
       SERVER_URL: http://api:3001
 
   api:
+    container_name: api
     build:
       context: .
       dockerfile: apps/api/Dockerfile

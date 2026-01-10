@@ -26,27 +26,27 @@ export class AuthService {
     pass: string,
     name: string,
   ): Promise<{ access_token: string }> {
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.sendgrid.net',
-      port: 587,
-      secure: true,
-      auth: {
-        user: 'davin.paucek65@ethereal.email',
-        pass: 'ydRuSN5sj3bwDCzfPD',
-      },
-    });
+    // const transporter = nodemailer.createTransport({
+    //   host: 'smtp.sendgrid.net',
+    //   port: 587,
+    //   secure: true,
+    //   auth: {
+    //     user: 'davin.paucek65@ethereal.email',
+    //     pass: 'ydRuSN5sj3bwDCzfPD',
+    //   },
+    // });
 
-    (async () => {
-      const info = await transporter.sendMail({
-        from: '"Richard" <hua.richard0@gmail.com>',
-        to: 'hua.richard0@gmail.com',
-        subject: '2 ✔',
-        text: 'Hello world?',
-        html: '<b>Hello world?</b>',
-      });
+    // (async () => {
+    //   const info = await transporter.sendMail({
+    //     from: '"Richard" <hua.richard0@gmail.com>',
+    //     to: 'hua.richard0@gmail.com',
+    //     subject: '2 ✔',
+    //     text: 'Hello world?',
+    //     html: '<b>Hello world?</b>',
+    //   });
 
-      console.log('Message sent:', info.messageId);
-    })();
+    //   console.log('Message sent:', info.messageId);
+    // })();
     const user = await this.usersService.createOne(name, email, pass);
     if (!user) {
       throw new UnauthorizedException();
