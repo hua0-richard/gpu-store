@@ -1,4 +1,6 @@
-"use client"
+"use client";
+
+import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,17 +13,59 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { submitLogin } from "./action";
+import { useRouter } from "next/navigation"
 
-export default function Signup() {
+export default function Login() {
+  const router = useRouter();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isPending, startTransition] = useTransition();
+
+  const canSubmit = email.trim().length > 0 && password.length > 0;
+
+  async function handleLogin() {
+    if (!canSubmit) return;
+
+    startTransition(async () => {
+      try {
+        const res = await fetch("/signup/user", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            email: email.trim(),
+            pass: password,
+          }),
+        });
+
+        if (!res.ok) {
+          throw new Error("signup failed");
+        }
+
+        const data = await res.json();
+
+        if (data.ok) {
+          // redirect, update state, etc.
+          router.push("/");
+        }
+      } catch (err) {
+        // handle error state here
+        console.error(err);
+      }
+    });
+  }
+
   return (
     <div className="flex flex-col h-screen">
       <div className="w-screen h-full flex items-center justify-center bg-background">
         <Card className="w-full max-w-sm">
           <CardHeader>
-            <CardTitle>Signup</CardTitle>
+            <CardTitle>Login to your account</CardTitle>
             <CardDescription>
-              Enter your email below to Signup to your account
+              Enter your email below to login to your account
             </CardDescription>
             <CardAction>
               <Button variant="link">Sign Up</Button>
@@ -29,42 +73,53 @@ export default function Signup() {
           </CardHeader>
 
           <CardContent>
-            <form action={submitLogin}>
-              <div className="flex flex-col gap-6">
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    name="email"          // ✅ required
-                    type="email"
-                    placeholder="m@example.com"
-                    required
-                  />
-                </div>
-
-                <div className="grid gap-2">
-                  <div className="flex items-center">
-                    <Label htmlFor="password">Password</Label>
-                    <a
-                      href="#"
-                      className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                    >
-                      Forgot your password?
-                    </a>
-                  </div>
-                  <Input
-                    id="password"
-                    name="password" 
-                    type="password"
-                    required
-                  />
-                </div>
-
-                <Button type="submit" className="w-full">
-                  Login
-                </Button>
+            <div className="flex flex-col gap-6">
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleLogin();
+                  }}
+                />
               </div>
-            </form>
+
+              <div className="grid gap-2">
+                <div className="flex items-center">
+                  <Label htmlFor="password">Password</Label>
+                  <a
+                    href="#"
+                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                  >
+                    Forgot your password?
+                  </a>
+                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleLogin();
+                  }}
+                />
+              </div>
+
+              <Button
+                type="button"
+                className="w-full"
+                onClick={handleLogin}
+                disabled={!canSubmit || isPending}
+              >
+                {isPending ? "Logging in…" : "Login"}
+              </Button>
+            </div>
           </CardContent>
 
           <CardFooter className="flex-col gap-2">

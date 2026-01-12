@@ -29,7 +29,6 @@ const SetAuthContext = createContext<
 >(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
   const [authState, setAuthState] = useState<AuthState>({
     isAuthenticated: false,
     user: null,
@@ -70,7 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
     checkAuth();
-  }, [pathname]);
+  }, []);
 
   return (
     <AuthContext.Provider value={authState}>

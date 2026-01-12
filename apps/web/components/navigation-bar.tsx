@@ -24,7 +24,6 @@ export default function NavigationBar() {
         logout()
         setAuth({ isAuthenticated: false, user: null, loading: false });
         router.replace("/")
-        router.refresh()
       }}>Log Out</Button> : <></>}
       <Navigation></Navigation>
       <div className="flex gap-2">

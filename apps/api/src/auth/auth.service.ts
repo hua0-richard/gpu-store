@@ -10,22 +10,20 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn(email: string, pass: string): Promise<{ access_token: string }> {
+  async signIn(email: string, pass: string): Promise<{ user: {email: string, name: string | null} , access_token: string }> {
     const user = await this.usersService.findOne(email, pass);
     if (!user) {
       throw new UnauthorizedException();
     }
     const payload = { email: user.email };
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-    };
+    return { user: { email: user.email, name: user.name }, access_token: await this.jwtService.signAsync(payload) };
   }
 
   async createUser(
     email: string,
     pass: string,
     name: string,
-  ): Promise<{ access_token: string }> {
+  ): Promise<{ user: {email: string, name: string | null} , access_token: string }> {
     // const transporter = nodemailer.createTransport({
     //   host: 'smtp.sendgrid.net',
     //   port: 587,
@@ -52,6 +50,6 @@ export class AuthService {
       throw new UnauthorizedException();
     }
     const payload = { email: user.email };
-    return { access_token: await this.jwtService.signAsync(payload) };
+    return { user: { email: user.email, name: user.name }, access_token: await this.jwtService.signAsync(payload) };
   }
 }
