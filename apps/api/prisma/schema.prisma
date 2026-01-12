@@ -15,6 +15,7 @@ model User {
   name  String?
   compute String?
   cart String?
+  refresh_token String?
 }
 
 model Cart {
