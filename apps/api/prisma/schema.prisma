@@ -15,7 +15,18 @@ model User {
   name  String?
   compute String?
   cart String?
-  refresh_token String?
+  sessions RefreshSession[]
+}
+
+model RefreshSession {
+  id Int @id @default(autoincrement())
+  userEmail String @unique
+  refreshHash String?
+  expiresAt DateTime?
+  revokedAt DateTime?
+
+  user User @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+
 }
 
 model Cart {

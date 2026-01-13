@@ -19,11 +19,7 @@ export class UsersService {
     return user;
   }
 
-  async createOne(
-    name: string,
-    email: string,
-    password: string,
-  ): Promise<User | undefined> {
+  async createOne(name: string, email: string, password: string): Promise<User | undefined> {
     const hashed: string = await bcrypt.hash(password, 12);
     const user = await prisma.user.create({
       data: {
@@ -34,7 +30,4 @@ export class UsersService {
     });
     return user;
   }
-
-  
-
 }

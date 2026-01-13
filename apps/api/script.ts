@@ -4,14 +4,20 @@ import bcrypt from 'bcrypt';
 async function main() {
   type User = {
     name: string;
-    email: string; 
+    email: string;
     password: string;
   };
 
   const usersData: Array<User> = [];
 
+  type RefreshSession = {
+    userEmail: string;
+  };
+
+  const refreshSessionsData: Array<RefreshSession> = [];
+
   for (let i = 0; i < 20; i++) {
-    const userIndex = i +  1;
+    const userIndex = i + 1;
     const hash = await bcrypt.hash(String(i), 12).catch((err: any) => {
       console.error(err);
       return '';
@@ -21,10 +27,19 @@ async function main() {
       email: `user${userIndex}@example.com`,
       password: hash,
     });
+
+    refreshSessionsData.push({
+      userEmail: `user${userIndex}@example.com`,
+    });
   }
 
   await prisma.user.createMany({
     data: usersData,
+    skipDuplicates: true,
+  });
+
+  await prisma.refreshSession.createMany({
+    data: refreshSessionsData,
     skipDuplicates: true,
   });
 }
