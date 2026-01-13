@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
-import { RefreshSessionsService } from '../refresh-sessions/refresh-sessions.service';
+import { RefreshSessionsService } from 'src/refresh-sessions/refresh-sessions.service';
 import { JwtService } from '@nestjs/jwt';
 import { randomBytes } from 'crypto';
 import bcrypt from 'bcrypt';
@@ -22,31 +22,35 @@ export class AuthService {
     return await bcrypt.hash(token, 12);
   }
 
+  async createUserRefreshTokenEntry(email: string): Promise<boolean> {
+    const refreshSessionForUser = await this.refreshSessionsService.createOneUser(email);
+    if (!refreshSessionForUser) {
+      return false;
+    }
+    return true;
+  }
+
+  async createRefreshTokenEntry(email: string): Promise<string> {
+    const refreshToken = await this.generateRefreshToken();
+    const refreshTokenHash = await this.generateRefreshHash(refreshToken);
+    const tokenResult = await this.refreshSessionsService.createOne(email, refreshTokenHash);
+    return refreshToken;
+  }
+
   async signIn(
     email: string,
     pass: string,
-  ): Promise<{
-    user: { email: string; name: string | null };
-    access_token: string;
-    refresh_token: string;
-  }> {
+  ): Promise<{ user: { email: string; name: string | null }; access_token: string; refresh_token: string }> {
     const user = await this.usersService.findOne(email, pass);
     if (!user) {
       throw new UnauthorizedException();
     }
 
     const payload = { email: user.email };
-    const refreshToken = this.generateRefreshToken();
-    const refreshTokenHash = await this.generateRefreshHash(refreshToken);
     const accessToken = await this.jwtService.signAsync(payload, {
-      expiresIn: '15m',
+      expiresIn: "5m",
     });
-
-    const result = await this.refreshSessionsService.createOne(email, refreshTokenHash);
-
-    if (!result) {
-      throw new NotFoundException();
-    }
+    const refreshToken = await this.createRefreshTokenEntry(email);
 
     return {
       user: { email: user.email, name: user.name },
@@ -86,17 +90,17 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException();
     }
+    const userRefreshEntry = await this.createUserRefreshTokenEntry(email);
+
+    if (!userRefreshEntry) {
+      throw new InternalServerErrorException('Failed to create refresh token entry for user');
+    }
 
     const payload = { email: user.email };
-
-    const refreshSessionForUser = await this.refreshSessionsService.createOneUser(email);
-    const refreshToken = this.generateRefreshToken();
-    const refreshTokenHash = await this.generateRefreshHash(refreshToken);
     const accessToken = await this.jwtService.signAsync(payload, {
-      expiresIn: '15m',
+      expiresIn: "5m",
     });
-
-    const result = await this.refreshSessionsService.createOne(email, refreshTokenHash);
+    const refreshToken = await this.createRefreshTokenEntry(email);
 
     return {
       user: { email: user.email, name: user.name },

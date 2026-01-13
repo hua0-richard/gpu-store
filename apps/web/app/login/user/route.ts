@@ -29,16 +29,16 @@ export async function POST(req: Request) {
   }
 
   const data: { user: {email: string, name: string | null}, access_token?: string } = await res.json();
-  const token = data.access_token;
+  const accessToken = data.access_token;
 
-  if (!token) {
+  if (!accessToken) {
     return NextResponse.json(
       { message: "No token returned from server" },
       { status: 500 }
     );
   }
 
-  (await cookies()).set("session", token, {
+  (await cookies()).set("session", accessToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",

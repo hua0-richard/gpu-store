@@ -1,20 +1,25 @@
 ## Overview
 
 ## Architecture
-
-Authentication is handled using `bcrypt` and a JWT Token. 
+Authentication is handled via a Refresh Token and JWT token. Passwords are hashed with `bcrypt`. 
 
 ## Tech Stack
+
+### Frontend
 Next.js 
 Shadcn 
 
+### Backebd
 NestJS
 Prisma
-Postgres
+PostgreSQL
 Stripe Payments
 Redis Caching
 
 ## Features
+Cart
+Login
+Payments
 
 ## Local Development
 
@@ -25,7 +30,7 @@ To view the contents of the database
 `DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ecommerce pnpm prisma studio`
 
 To reset the database
-`docker exec -it api pnpm prisma migrate reset`
+`pnpm: db:dev:reset`
 
 ## Background Jobs
 
@@ -37,3 +42,7 @@ Server is deployed on Azure
 Database is managed using Prisma
 
 ## Testing
+
+### Tooling
+Prettier
+Eslint
