@@ -22,19 +22,24 @@ export class AuthService {
     return await bcrypt.hash(token, 12);
   }
 
-  async createUserRefreshTokenEntry(email: string): Promise<boolean> {
-    const refreshSessionForUser = await this.refreshSessionsService.createOneUser(email);
-    if (!refreshSessionForUser) {
-      return false;
-    }
-    return true;
+  async createUserRefreshTokenEntry(email: string): Promise<string> {
+    const sessionId = crypto.randomUUID();
+    const refreshToken = await this.generateRefreshToken();
+    const refreshTokenHash = await this.generateRefreshHash(refreshToken);
+
+    const tokenResult = await this.refreshSessionsService.createOneUser(sessionId, email);
+
+    return `${sessionId}.${refreshToken}`;
   }
 
   async createRefreshTokenEntry(email: string): Promise<string> {
+    const sessionId = crypto.randomUUID();
     const refreshToken = await this.generateRefreshToken();
     const refreshTokenHash = await this.generateRefreshHash(refreshToken);
-    const tokenResult = await this.refreshSessionsService.createOne(email, refreshTokenHash);
-    return refreshToken;
+
+    const tokenResult = await this.refreshSessionsService.createOne(sessionId, email, refreshTokenHash);
+
+    return `${sessionId}.${refreshToken}`;
   }
 
   async signIn(
@@ -47,9 +52,7 @@ export class AuthService {
     }
 
     const payload = { email: user.email };
-    const accessToken = await this.jwtService.signAsync(payload, {
-      expiresIn: "5m",
-    });
+    const accessToken = await this.jwtService.signAsync(payload);
     const refreshToken = await this.createRefreshTokenEntry(email);
 
     return {
@@ -87,19 +90,18 @@ export class AuthService {
     // })();
 
     const user = await this.usersService.createOne(name, email, pass);
+    
     if (!user) {
       throw new UnauthorizedException();
     }
-    const userRefreshEntry = await this.createUserRefreshTokenEntry(email);
 
-    if (!userRefreshEntry) {
-      throw new InternalServerErrorException('Failed to create refresh token entry for user');
-    }
+    // const userRefreshEntry = await this.createUserRefreshTokenEntry(email);
+    // if (!userRefreshEntry) {
+    //   throw new InternalServerErrorException('Failed to create refresh token entry for user');
+    // }
 
     const payload = { email: user.email };
-    const accessToken = await this.jwtService.signAsync(payload, {
-      expiresIn: "5m",
-    });
+    const accessToken = await this.jwtService.signAsync(payload);
     const refreshToken = await this.createRefreshTokenEntry(email);
 
     return {
@@ -107,5 +109,18 @@ export class AuthService {
       access_token: accessToken,
       refresh_token: refreshToken,
     };
+  }
+
+  async refreshAccessToken(refreshToken: string): Promise<{access_token: string}> {
+    const [sessionId, token] = refreshToken.split(".");
+    const refreshTokenResult = await this.refreshSessionsService.findOneToken(sessionId, token)
+    if (!refreshTokenResult) {
+      throw new UnauthorizedException('Invalid refresh token')
+    }
+    const payload = { email: refreshTokenResult.email };
+    const accessToken = await this.jwtService.signAsync(payload);
+    return {
+        access_token: accessToken
+    }
   }
 }

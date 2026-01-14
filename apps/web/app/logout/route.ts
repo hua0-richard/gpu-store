@@ -10,5 +10,16 @@ export async function POST() {
     secure: true,
     sameSite: "strict",
   });
+
+
+  res.cookies.set("refresh", "", {
+    maxAge: 0,
+    path: "/",
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+  });
+  
+
   return res
 }

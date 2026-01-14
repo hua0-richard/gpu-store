@@ -28,17 +28,33 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: msg }, { status: res.status });
   }
 
-  const data: { user: {email: string, name: string | null}, access_token?: string } = await res.json();
+  const data: { user: {email: string, name: string | null}, access_token?: string, refresh_token?: string } = await res.json();
   const accessToken = data.access_token;
+  const refreshToken = data.refresh_token;
 
   if (!accessToken) {
     return NextResponse.json(
-      { message: "No token returned from server" },
+      { message: "No access token returned from server" },
+      { status: 500 }
+    );
+  }
+
+  if (!refreshToken) {
+    return NextResponse.json(
+      { message: "No refresh token returned from server" },
       { status: 500 }
     );
   }
 
   (await cookies()).set("session", accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 20,
+  });
+
+  (await cookies()).set("refresh", refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",

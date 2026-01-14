@@ -1,6 +1,8 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, UseGuards } from '@nestjs/common';
+import { Request } from "express";
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
+
 
 @Controller('auth')
 export class AuthController {
@@ -18,9 +20,16 @@ export class AuthController {
     return this.authService.createUser(newUser.email, newUser.password, newUser.name);
   }
 
+  @Post("refresh")
+  refresh(@Req() req: Request) {
+    const refreshToken = req.cookies?.refresh;
+    const user = req.cookies?.user; // only if you actually store this (often you shouldn't)
+    return this.authService.refreshAccessToken(refreshToken);
+  }
+
   @UseGuards(AuthGuard)
   @Get('profile')
-  getProfile(@Request() req) {
+  getProfile(@Req() req) {
     return req.user;
   }
 }

@@ -27,19 +27,39 @@ export async function POST(req: Request) {
     throw new Error(msg);
   }
 
-  const data: { user: {email: string, name: string | null}, access_token?: string } = await res.json();
-  const token = data.access_token;
-  console.log(token);
-  if (!token) {
-    throw new Error("No token returned from server");
+  const data: { user: {email: string, name: string | null}, access_token?: string, refresh_token?: string } = await res.json();
+  const accessToken = data.access_token;
+  const refreshToken = data.refresh_token;
+
+  if (!accessToken) {
+    return NextResponse.json(
+      { message: "No access token returned from server" },
+      { status: 500 }
+    );
   }
 
-  (await cookies()).set("session", token, {
+  if (!refreshToken) {
+    return NextResponse.json(
+      { message: "No refresh token returned from server" },
+      { status: 500 }
+    );
+  }
+
+  (await cookies()).set("session", accessToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    path: "/", // allow all routes including /api/*
-    maxAge: 60 * 5, // 5 minutes
+    path: "/",
+    maxAge: 60,
   });
-  redirect("/");
+
+  (await cookies()).set("refresh", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 5,
+  });
+
+  return NextResponse.json({ user: data.user});
 }

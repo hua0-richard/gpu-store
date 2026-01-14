@@ -14,6 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation"
+import { useAuth, useSetAuth } from "@/components/auth-context";
 
 export default function Login() {
   const router = useRouter();
@@ -21,6 +22,8 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isPending, startTransition] = useTransition();
+
+  const setAuth = useSetAuth();
 
   const canSubmit = email.trim().length > 0 && password.length > 0;
 
@@ -47,8 +50,12 @@ export default function Login() {
 
         const data = await res.json();
 
-        if (data.ok) {
-          // redirect, update state, etc.
+        if (data) {
+          setAuth({
+            isAuthenticated: true,
+            user: data.user,
+            loading: false,
+          })
           router.push("/");
         }
       } catch (err) {
