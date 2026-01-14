@@ -60,7 +60,7 @@ pnpm db:seed:dev
 ```
 
 ```bash
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ecommerce pnpm prisma studio
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ecommerce pnpm prisma studio --port=5555
 ```
 
 ```bash
