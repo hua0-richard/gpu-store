@@ -94,7 +94,7 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException();
     }
-    
+
     const payload = { email: user.email };
     const accessToken = await this.jwtService.signAsync(payload);
     const refreshToken = await this.createRefreshTokenEntry(email);
@@ -117,5 +117,13 @@ export class AuthService {
     return {
         access_token: accessToken
     }
+  }
+
+  async revokeRefreshToken(refreshToken: string): Promise<void> {
+      const [sessionId, token] = refreshToken.split(".");
+      const revokeUserToken = this.refreshSessionsService.revokeOneToken(sessionId);
+      if (!revokeUserToken) {
+        return
+      }
   }
 }

@@ -66,3 +66,6 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ecommerce pnpm prisma
 ```bash
 pnpm db:dev:reset
 ```
+
+## CI / CD
+Frontend is deployed on vercel

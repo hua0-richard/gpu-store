@@ -13,6 +13,7 @@ export class RefreshSessionsService {
       data: {
         sessionId: sessionId,
         refreshHash: tokenHash,
+        revokedAt: null,
         expiresAt: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
       },
     });
@@ -25,6 +26,7 @@ export class RefreshSessionsService {
         userEmail: email,
         sessionId: sessionId,
         refreshHash: tokenHash,
+        revokedAt: null,
         expiresAt: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
       },
     });
@@ -48,5 +50,21 @@ export class RefreshSessionsService {
     }
 
     return { email: userRefreshSession.userEmail };
+  }
+
+  async revokeOneToken(sessionId: string): Promise<boolean> {
+    const revokeUserToken = await prisma.refreshSession.update({
+      where: { sessionId: sessionId },
+      data: {
+        sessionId: sessionId,
+        revokedAt: new Date(Date.now()),
+      },
+    });
+
+    if (!revokeUserToken) {
+      return false;
+    }
+
+    return true;
   }
 }
