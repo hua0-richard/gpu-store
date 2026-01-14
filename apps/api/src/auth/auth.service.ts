@@ -94,12 +94,7 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException();
     }
-
-    // const userRefreshEntry = await this.createUserRefreshTokenEntry(email);
-    // if (!userRefreshEntry) {
-    //   throw new InternalServerErrorException('Failed to create refresh token entry for user');
-    // }
-
+    
     const payload = { email: user.email };
     const accessToken = await this.jwtService.signAsync(payload);
     const refreshToken = await this.createRefreshTokenEntry(email);

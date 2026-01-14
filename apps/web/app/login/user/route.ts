@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: 20,
+    maxAge: 60 * 5,
   });
 
   (await cookies()).set("refresh", refreshToken, {
@@ -59,7 +59,7 @@ export async function POST(req: Request) {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: 60 * 5,
+    maxAge: 24 * 60 * 60 * 1000,
   });
 
   return NextResponse.json({ user: data.user});

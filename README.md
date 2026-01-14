@@ -1,48 +1,68 @@
-## Overview
+# Full-Stack E-Commerce Platform
 
-## Architecture
-Authentication is handled via a Refresh Token and JWT token. Passwords are hashed with `bcrypt`. 
+Production-grade full-stack application featuring secure authentication, Stripe payments, background jobs, and modern frontend architecture.
 
-## Tech Stack
+---
+
+## 📌 Overview
+This project demonstrates an end-to-end web application with authentication, payments, and asynchronous processing, built using modern TypeScript-based tooling across the stack.
+
+---
+
+## 🏗 Architecture
+- **Authentication**: JWT access tokens with refresh tokens
+- **Security**: Password hashing using `bcrypt`
+- **Payments**: Stripe Checkout with webhook-driven state updates
+- **Background Jobs**: Redis-backed async processing
+- **Data Layer**: Prisma ORM with PostgreSQL
+
+---
+
+## 🧰 Tech Stack
 
 ### Frontend
-Next.js 
-Shadcn 
+- **Next.js**
+- **shadcn/ui**
+- **TypeScript**
 
-### Backebd
-NestJS
-Prisma
-PostgreSQL
-Stripe Payments
-Redis Caching
+### Backend
+- **NestJS**
+- **Prisma**
+- **PostgreSQL**
+- **Stripe**
+- **Redis**
 
-## Features
-Cart
-Login
-Payments
+---
 
-## Local Development
+## ✨ Core Features
+- User authentication (login, refresh, logout)
+- Shopping cart
+- Secure Stripe payments
+- Webhook-driven payment lifecycle
+- Background job processing
+
+---
+
+## 🔄 Key Engineering Highlights
+- Designed **token-based auth** with refresh tokens
+<!-- - Implemented **Stripe webhooks** with signature verification and idempotency -->
+<!-- - Built **Redis-backed job processing** for non-blocking workflows -->
+- Enforced **clear service boundaries** in a NestJS architecture
+- Used **Prisma migrations** for safe schema evolution
+
+## 🧪 Local Development
 
 ### Database
-1. `pnpm db:seed:dev`
 
-To view the contents of the database
-`DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ecommerce pnpm prisma studio`
+Seed the database:
+```bash
+pnpm db:seed:dev
+```
 
-To reset the database
-`pnpm: db:dev:reset`
+```bash
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ecommerce pnpm prisma studio
+```
 
-## Background Jobs
-
-## Stripe Webhooks
-
-## Deployment
-Frontend is deployed on vercel
-Server is deployed on Azure
-Database is managed using Prisma
-
-## Testing
-
-### Tooling
-Prettier
-Eslint
+```bash
+pnpm db:dev:reset
+```
