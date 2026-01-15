@@ -9,7 +9,7 @@ export class RefreshSessionsService {
 
   async updateOne(sessionId: string, email: string, tokenHash: string): Promise<boolean> {
     await prisma.refreshSession.update({
-      where: { userEmail: email },
+      where: { sessionId: sessionId },
       data: {
         sessionId: sessionId,
         refreshHash: tokenHash,
@@ -53,15 +53,15 @@ export class RefreshSessionsService {
   }
 
   async revokeOneToken(sessionId: string): Promise<boolean> {
-    const revokeUserToken = await prisma.refreshSession.update({
-      where: { sessionId: sessionId },
-      data: {
-        sessionId: sessionId,
-        revokedAt: new Date(Date.now()),
-      },
-    });
-
-    if (!revokeUserToken) {
+    try {
+      const revokeUserToken = await prisma.refreshSession.update({
+        where: { sessionId: sessionId },
+        data: {
+          sessionId: sessionId,
+          revokedAt: new Date(Date.now()),
+        },
+      });
+    } catch {
       return false;
     }
 

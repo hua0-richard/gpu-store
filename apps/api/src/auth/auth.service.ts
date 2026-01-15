@@ -22,16 +22,6 @@ export class AuthService {
     return await bcrypt.hash(token, 12);
   }
 
-  async updateRefreshTokenEntry(email: string): Promise<string> {
-    const sessionId = crypto.randomUUID();
-    const refreshToken = await this.generateRefreshToken();
-    const refreshTokenHash = await this.generateRefreshHash(refreshToken);
-
-    const tokenResult = await this.refreshSessionsService.updateOne(sessionId, email, refreshTokenHash);
-
-    return `${sessionId}.${refreshToken}`;
-  }
-
   async createRefreshTokenEntry(email: string): Promise<string> {
     const sessionId = crypto.randomUUID();
     const refreshToken = await this.generateRefreshToken();
@@ -53,7 +43,7 @@ export class AuthService {
 
     const payload = { email: user.email };
     const accessToken = await this.jwtService.signAsync(payload);
-    const refreshToken = await this.updateRefreshTokenEntry(email);
+    const refreshToken = await this.createRefreshTokenEntry(email);
 
     return {
       user: { email: user.email, name: user.name },

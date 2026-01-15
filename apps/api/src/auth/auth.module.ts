@@ -13,7 +13,7 @@ import { RefreshSessionsModule } from '../refresh-sessions/refresh-sessions.modu
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: '300s' },
+      signOptions: { expiresIn: '20s' },
     }),
   ],
   providers: [AuthService],

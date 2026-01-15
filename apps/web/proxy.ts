@@ -8,6 +8,7 @@ export async function middleware(request: NextRequest) {
   const isProtectedRoute = request.nextUrl.pathname.startsWith("/amd");
 
   if (isProtectedRoute && !hasSession && hasRefresh) {
+    console.log("here")
     const refreshRes = await fetch(new URL("/api/auth/refresh", request.url), {
       method: "POST",
       headers: {

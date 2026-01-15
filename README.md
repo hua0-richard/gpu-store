@@ -69,3 +69,11 @@ pnpm db:dev:reset
 
 ## CI / CD
 Frontend is deployed on vercel
+
+### Notes
+Useful Test Billing Info
+
+Card number: 4242 4242 4242 4242
+Expiry: any future date (e.g., 12/34)
+CVC: any 3 digits (e.g., 123)
+ZIP/postal: any (e.g., 12345)

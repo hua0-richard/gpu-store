@@ -19,7 +19,7 @@ model User {
 
 model RefreshSession {
   id String @id @default(uuid())  
-  userEmail String @unique
+  userEmail String
   sessionId String @unique
   refreshHash String?
   expiresAt DateTime?

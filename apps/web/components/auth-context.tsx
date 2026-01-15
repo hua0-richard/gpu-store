@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
-import { usePathname } from "next/navigation";
+import { createContext, useContext, useEffect, useState } from "react";
 
 export interface User {
   email: string;
@@ -24,9 +18,9 @@ const AuthContext = createContext<AuthState>({
   loading: true,
 });
 
-const SetAuthContext = createContext<
-  React.Dispatch<React.SetStateAction<AuthState>> | null
->(null);
+const SetAuthContext = createContext<React.Dispatch<
+  React.SetStateAction<AuthState>
+> | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [authState, setAuthState] = useState<AuthState>({
@@ -35,40 +29,66 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     loading: true,
   });
 
-  // added pathname as dep
   useEffect(() => {
+    let cancelled = false;
+
     async function checkAuth() {
       try {
-        const res = await fetch("/api/auth/profile", {
+        let res = await fetch("/api/auth/profile", {
           method: "GET",
           credentials: "include",
+          cache: "no-store",
         });
 
+        if (res.status === 401) {
+          const refreshRes = await fetch("/refresh/user", {
+            method: "POST",
+            credentials: "include",
+            cache: "no-store",
+          });
+
+          if (!refreshRes.ok) {
+            throw new Error("Refresh failed");
+          }
+
+          console.log("finished")
+
+          res = await fetch("/api/auth/profile", {
+            method: "GET",
+            credentials: "include",
+            cache: "no-store",
+          });
+        }
+
         if (!res.ok) {
+          throw new Error("Profile fetch failed");
+        }
+
+        const user = await res.json();
+
+        if (!cancelled) {
+          setAuthState({
+            isAuthenticated: true,
+            user,
+            loading: false,
+          });
+        }
+      } catch {
+        if (!cancelled) {
           setAuthState({
             isAuthenticated: false,
             user: null,
             loading: false,
           });
-          return;
         }
-
-        const user = await res.json();
-
-        setAuthState({
-          isAuthenticated: true,
-          user,
-          loading: false,
-        });
-      } catch {
-        setAuthState({
-          isAuthenticated: false,
-          user: null,
-          loading: false,
-        });
       }
     }
+
     checkAuth();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (

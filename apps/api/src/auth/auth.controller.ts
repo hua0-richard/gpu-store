@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
@@ -22,6 +22,9 @@ export class AuthController {
   @Post('refresh')
   refresh(@Req() req: Request) {
     const refreshToken = req.cookies?.refresh;
+    if (!refreshToken) {
+      throw new UnauthorizedException('Missing refresh cookie');
+    }
     return this.authService.refreshAccessToken(refreshToken);
   }
 
