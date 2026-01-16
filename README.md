@@ -9,9 +9,14 @@ This project demonstrates an end-to-end web application with authentication, pay
 
 ---
 
+## Quick Start Local
+1. `docker compose up`
+2. `pnpm db:seed:dev`
+3. `http://localhost:3000/`
+
 ## 🏗 Architecture
-- **Authentication**: JWT access tokens with refresh tokens
-- **Security**: Password hashing using `bcrypt`
+- **Authentication**: JWT access tokens with refresh tokens with multiple sessions
+- **Security**: Password and Refresh token hashing using `bcrypt`
 - **Payments**: Stripe Checkout with webhook-driven state updates
 - **Background Jobs**: Redis-backed async processing
 - **Data Layer**: Prisma ORM with PostgreSQL

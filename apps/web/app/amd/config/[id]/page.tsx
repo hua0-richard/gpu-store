@@ -218,7 +218,7 @@ export default function ConfigPage() {
 
           {/* RIGHT COLUMN - SUMMARY */}
           <div className="w-full lg:w-[360px]">
-            <div className="sticky top-8">
+            <div className="top-8">
               <Card className="border border-border/60 shadow-none bg-card/50 backdrop-blur-sm">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-xl font-medium">Summary</CardTitle>

@@ -1,3 +1,4 @@
+"use client"
 import { ProductCard } from "@/components/product-card";
 import { robotoMono } from "@/app/fonts";
 import { Button } from "@/components/ui/button";
