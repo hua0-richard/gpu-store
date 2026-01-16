@@ -1,9 +1,15 @@
 import { Controller, Post, Req, Res, Headers, HttpCode } from '@nestjs/common';
 import { Request, Response } from 'express';
 import Stripe from 'stripe';
+import { RedisService } from '../redis/redis.service';
+import { LockService } from '../redis/lock.service';
 
 @Controller('webhooks/stripe')
 export class StripeController {
+  constructor(
+    private redisService: RedisService,
+    private lockService: LockService,
+  ) {}
   private stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     // set api version
   });
@@ -15,6 +21,7 @@ export class StripeController {
     @Res() res: Response,
     @Headers('stripe-signature') signature?: string,
   ) {
+    console.log('Received Stripe webhook');
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
     if (!signature) return res.status(400).send('Missing stripe-signature');
@@ -27,6 +34,14 @@ export class StripeController {
 
     try {
       event = this.stripe.webhooks.constructEvent(req.rawBody, signature, webhookSecret);
+
+      const pi = event.data.object as Stripe.PaymentIntent;
+      const lockKey = `lock:stripe:event:${event.id}`;
+      const gotLock = await this.lockService.acquire(lockKey, 300);
+      if (!gotLock) {
+        // duplicate delivery or retry
+        return;
+      }
     } catch (err: any) {
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
@@ -70,12 +85,12 @@ export class StripeController {
                 credits: '500',
                 sku: 'GPU-500',
               },
-            },  
+            },
           },
         },
       ],
-      success_url: "https://example.com/success?session_id={CHECKOUT_SESSION_ID}",
-      cancel_url: "https://example.com/cancel",
+      success_url: 'https://example.com/success?session_id={CHECKOUT_SESSION_ID}',
+      cancel_url: 'https://example.com/cancel',
     });
 
     if (!session.url) {
