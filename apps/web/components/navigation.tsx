@@ -29,28 +29,36 @@ export function Navigation() {
         <NavigationMenuItem className="hidden md:block">
           <NavigationMenuTrigger>AMD</NavigationMenuTrigger>
           <NavigationMenuContent>
-            <ul className="grid w-[150px] gap-4">
+            <ul className="grid w-[150px] gap-1 p-1">
               <li>
                 <NavigationMenuLink asChild>
                   <Link href="#">
                     <div className="font-medium">MI300X</div>
                   </Link>
                 </NavigationMenuLink>
+              </li>
+              <li>
                 <NavigationMenuLink asChild>
                   <Link href="#">
                     <div className="font-medium">MI325X</div>
                   </Link>
                 </NavigationMenuLink>
+              </li>
+              <li>
                 <NavigationMenuLink asChild>
                   <Link href="#">
                     <div className="font-medium">MI355X</div>
                   </Link>
                 </NavigationMenuLink>
+              </li>
+              <li>
                 <NavigationMenuLink asChild>
                   <Link href="#">
                     <div className="font-medium">MI250X</div>
                   </Link>
                 </NavigationMenuLink>
+              </li>
+              <li>
                 <NavigationMenuLink asChild>
                   <Link href="#">
                     <div className="flex justify-between ">
@@ -66,23 +74,29 @@ export function Navigation() {
         <NavigationMenuItem className="hidden md:block">
           <NavigationMenuTrigger>NVIDIA</NavigationMenuTrigger>
           <NavigationMenuContent>
-            <ul className="grid w-[150px] gap-4">
+            <ul className="grid w-[150px] gap-1 p-1">
               <li>
                 <NavigationMenuLink asChild>
                   <Link href="#">
                     <div className="font-medium">A100</div>
                   </Link>
                 </NavigationMenuLink>
+              </li>
+              <li>
                 <NavigationMenuLink asChild>
                   <Link href="#">
                     <div className="font-medium">H100</div>
                   </Link>
                 </NavigationMenuLink>
+              </li>
+              <li>
                 <NavigationMenuLink asChild>
                   <Link href="#">
                     <div className="font-medium">H200</div>
                   </Link>
                 </NavigationMenuLink>
+              </li>
+              <li>
                 <NavigationMenuLink asChild>
                   <Link href="#">
                     <div className="flex justify-between ">

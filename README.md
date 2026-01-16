@@ -1,4 +1,4 @@
-# Full-Stack E-Commerce Platform
+# Compute Billing Platform
 
 Production-grade full-stack application featuring secure authentication, Stripe payments, background jobs, and modern frontend architecture.
 
@@ -70,6 +70,14 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ecommerce pnpm prisma
 
 ```bash
 pnpm db:dev:reset
+```
+Enable Stripe webhooks locally using the Stripe CLI:
+```
+stripe listen --forward-to localhost:3001/webhooks/stripe
+```
+Could be required
+```
+stripe login
 ```
 
 ## CI / CD

@@ -7,7 +7,15 @@ import Link from "next/link";
 import { ModeToggle } from "@/components/theme-toggle";
 import { useAuth, useSetAuth } from "@/components/auth-context";
 import { useRouter } from "next/navigation";
-import { Spinner } from "./ui/spinner";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function NavigationBar() {
   const { loading, isAuthenticated, user } = useAuth();
@@ -21,19 +29,7 @@ export default function NavigationBar() {
   };
   return (
     <div className="flex w-full justify-between py-8 mb-16">
-      {isAuthenticated ? (
-        <Button
-          onClick={() => {
-            logout();
-            setAuth({ isAuthenticated: false, user: null, loading: false });
-            router.replace("/");
-          }}
-        >
-          Log Out
-        </Button>
-      ) : (
-        <></>
-      )}
+
       <Navigation></Navigation>
       <div className="flex gap-2">
         <ModeToggle></ModeToggle>
@@ -41,13 +37,41 @@ export default function NavigationBar() {
           <ShoppingBag></ShoppingBag>
         </Button>
 
-        <Button variant="outline" asChild disabled={loading}>
-          <Link href="/login" className="flex items-center gap-2">
-            {loading && <Spinner className="h-4 w-4" />}
-            {!loading && <User className="mr-2" />}
-            {!loading && (isAuthenticated ? user?.email : "Log in")}
-          </Link>
-        </Button>
+        {loading ? (
+          <Button variant="outline" disabled className="flex items-center gap-2 w-[140px] justify-between">
+            <Skeleton className="h-4 w-4 rounded-full" />
+            <Skeleton className="h-4 w-[80px]" />
+          </Button>
+        ) : isAuthenticated ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="flex items-center gap-2 w-[140px] justify-between">
+                <User className="h-4 w-4" />
+                <span className="w-[80px] truncate text-left">{user?.email}</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => {
+                  logout();
+                  setAuth({ isAuthenticated: false, user: null, loading: false });
+                  router.replace("/");
+                }}
+              >
+                Log Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <Button variant="outline" asChild>
+            <Link href="/login" className="flex items-center gap-2">
+              <User className="mr-2" />
+              Log in
+            </Link>
+          </Button>
+        )}
       </div>
     </div>
   );
