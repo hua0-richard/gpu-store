@@ -2,15 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { prisma } from '../../lib/prisma';
 import { User } from 'generated/prisma/client';
 import bcrypt from 'bcrypt';
-import { RefreshSessionsService } from 'src/refresh-sessions/refresh-sessions.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private refreshSessionsService: RefreshSessionsService) {
-
-  }
+  constructor() {}
   async findOne(email: string, password: string): Promise<User | undefined> {
-    const user = await prisma.user.findFirst({
+    const user = await prisma.user.findUnique({
       where: { email: email },
     });
     if (!user) {

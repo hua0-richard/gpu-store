@@ -1,15 +1,12 @@
-import { Controller, Post, Req, Res, Headers, HttpCode } from '@nestjs/common';
+import { Controller, Post, Req, Res, Headers, HttpCode, UseGuards } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { StripeService } from './stripe.service';
+import { AuthGuard } from 'src/auth/auth.guard';
 import Stripe from 'stripe';
-import { RedisService } from '../redis/redis.service';
-import { LockService } from '../redis/lock.service';
 
 @Controller('webhooks/stripe')
 export class StripeController {
-  constructor(
-    private redisService: RedisService,
-    private lockService: LockService,
-  ) {}
+  constructor(private stripeService: StripeService) {}
   private stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     // set api version
   });
@@ -21,57 +18,33 @@ export class StripeController {
     @Res() res: Response,
     @Headers('stripe-signature') signature?: string,
   ) {
-    console.log('Received Stripe webhook');
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
-
     if (!signature) return res.status(400).send('Missing stripe-signature');
-
     if (!req.rawBody) return res.status(400).send('Missing raw body');
 
-    let event: Stripe.Event;
-
-    console.log('Stripe Event Triggered');
+    let stripeEvent: Stripe.Event;
 
     try {
-      event = this.stripe.webhooks.constructEvent(req.rawBody, signature, webhookSecret);
-
-      const pi = event.data.object as Stripe.PaymentIntent;
-      const lockKey = `lock:stripe:event:${event.id}`;
-      const gotLock = await this.lockService.acquire(lockKey, 300);
-      if (!gotLock) {
-        // duplicate delivery or retry
-        return;
-      }
+      stripeEvent = this.stripe.webhooks.constructEvent(req.rawBody, signature, webhookSecret);
+      this.stripeService.handleStripeEvent(stripeEvent);
     } catch (err: any) {
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
-
-    switch (event.type) {
-      case 'checkout.session.completed': {
-        const session = event.data.object as Stripe.Checkout.Session;
-        // TODO: fulfill order / grant credits / mark paid
-        // Use session.id, session.customer, session.metadata, etc.
-        break;
-      }
-
-      case 'payment_intent.succeeded': {
-        const pi = event.data.object as Stripe.PaymentIntent;
-        // TODO: update billing state
-        break;
-      }
-
-      // add others you care about
-      default:
-        break;
-    }
-
     return res.json({ received: true });
   }
 
+  @UseGuards(AuthGuard)
   @Post('500credits')
-  async purchase500Credits() {
+  async purchase500Credits(@Req() req: Record<string, any>) {
+    const user = req.user as { email: string; name: string | null };
+    console.log(req.user);
     const session = await this.stripe.checkout.sessions.create({
       mode: 'payment',
+      payment_intent_data: {
+        metadata: {
+          userEmail: req.user.email,
+        },
+      },
       line_items: [
         {
           quantity: 1,
@@ -89,14 +62,13 @@ export class StripeController {
           },
         },
       ],
-      success_url: 'https://example.com/success?session_id={CHECKOUT_SESSION_ID}',
-      cancel_url: 'https://example.com/cancel',
+      success_url: process.env.FRONTEND_URL,
+      cancel_url: process.env.FRONTEND_URL,
     });
 
     if (!session.url) {
       throw new Error('Stripe session URL not created');
     }
-    console.log(session.url);
     return { url: session.url };
   }
 }

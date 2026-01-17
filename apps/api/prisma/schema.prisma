@@ -12,8 +12,6 @@ model User {
   email String  @unique
   password String
   name  String?
-  compute String?
-  cart String?
   sessions RefreshSession[]
 }
 
@@ -37,4 +35,10 @@ model Cart {
 model Compute {
   id    Int     @id @default(autoincrement())
   user_id Int
+}
+
+model PaymentEvents {
+    id    Int     @id @default(autoincrement())
+    eventId String @unique
+    userEmail String
 }
