@@ -26,41 +26,41 @@ export function Navigation() {
             <Link href="/">Home</Link>
           </NavigationMenuLink>
         </NavigationMenuItem>
-        <NavigationMenuItem className="hidden md:block">
+        <NavigationMenuItem className="block">
           <NavigationMenuTrigger>AMD</NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid w-[150px] gap-1 p-1">
               <li>
                 <NavigationMenuLink asChild>
-                  <Link href="#">
+                  <Link href="/amd/config/mi300x">
                     <div className="font-medium">MI300X</div>
                   </Link>
                 </NavigationMenuLink>
               </li>
               <li>
                 <NavigationMenuLink asChild>
-                  <Link href="#">
+                  <Link href="/amd/config/mi325x">
                     <div className="font-medium">MI325X</div>
                   </Link>
                 </NavigationMenuLink>
               </li>
               <li>
                 <NavigationMenuLink asChild>
-                  <Link href="#">
+                  <Link href="/amd/config/mi355x">
                     <div className="font-medium">MI355X</div>
                   </Link>
                 </NavigationMenuLink>
               </li>
               <li>
                 <NavigationMenuLink asChild>
-                  <Link href="#">
+                  <Link href="/amd/config/mi250x">
                     <div className="font-medium">MI250X</div>
                   </Link>
                 </NavigationMenuLink>
               </li>
               <li>
                 <NavigationMenuLink asChild>
-                  <Link href="#">
+                  <Link href="/amd">
                     <div className="flex justify-between ">
                       <div className="font-medium">View All</div>
                       <ArrowRight></ArrowRight>
@@ -71,34 +71,34 @@ export function Navigation() {
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
-        <NavigationMenuItem className="hidden md:block">
+        <NavigationMenuItem className="block">
           <NavigationMenuTrigger>NVIDIA</NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid w-[150px] gap-1 p-1">
               <li>
                 <NavigationMenuLink asChild>
-                  <Link href="#">
+                  <Link href="/nvidia/config/a100">
                     <div className="font-medium">A100</div>
                   </Link>
                 </NavigationMenuLink>
               </li>
               <li>
                 <NavigationMenuLink asChild>
-                  <Link href="#">
+                  <Link href="/nvidia/config/h100">
                     <div className="font-medium">H100</div>
                   </Link>
                 </NavigationMenuLink>
               </li>
               <li>
                 <NavigationMenuLink asChild>
-                  <Link href="#">
+                  <Link href="/nvidia/config/h200">
                     <div className="font-medium">H200</div>
                   </Link>
                 </NavigationMenuLink>
               </li>
               <li>
                 <NavigationMenuLink asChild>
-                  <Link href="#">
+                  <Link href="/nvidia">
                     <div className="flex justify-between ">
                       <div className="font-medium">View All</div>
                       <ArrowRight></ArrowRight>

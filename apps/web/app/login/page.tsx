@@ -70,9 +70,6 @@ export default function Login() {
             <CardDescription>
               Enter your email below to login to your account
             </CardDescription>
-            <CardAction>
-              <Button variant="link">Sign Up</Button>
-            </CardAction>
           </CardHeader>
 
           <CardContent>
@@ -125,10 +122,13 @@ export default function Login() {
             </div>
           </CardContent>
 
-          <CardFooter className="flex-col gap-2">
-            <Button variant="outline" className="w-full">
-              Login with Google
-            </Button>
+          <CardFooter className="flex flex-col gap-4">
+            <div className="text-center text-sm">
+              Don&apos;t have an account?{" "}
+              <Button variant="link" className="p-0 h-auto" onClick={() => router.push("/signup")}>
+                Sign Up
+              </Button>
+            </div>
           </CardFooter>
         </Card>
       </div>

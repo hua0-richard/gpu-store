@@ -8,11 +8,12 @@ import { Card, CardFooter } from "@/components/ui/card";
 type navigationProps = {
   imgResource: string;
   computeProvider: string;
+  href: string;
 };
 
-export function ProductCard({ imgResource, computeProvider }: navigationProps) {
+export function ProductCard({ imgResource, computeProvider, href }: navigationProps) {
   return (
-    <Link href="/amd" className="w-1/2 h-auto">
+    <Link href={href} className="w-full md:w-1/2 h-auto">
       <Card
         className="
     group relative
@@ -50,7 +51,7 @@ export function ProductCard({ imgResource, computeProvider }: navigationProps) {
         <div className="relative z-10 p-6">
           <div className="inline-flex items-center gap-2 rounded-xl border border-border/60 bg-background/60 px-4 py-2 backdrop-blur-sm">
             {/* <span className="font-mono text-muted-foreground">$</span> */}
-            <h3 className="font-mono text-xl md:text-2xl font-semibold tracking-tight">
+            <h3 className="font-mono text-xl md:text-2xl font-semibold tracking-tight text-center md:text-left">
               Get {computeProvider} Compute
             </h3>
           </div>

@@ -8,7 +8,7 @@
     "format": "prettier --write .",
     "lint": "pnpm -r lint",
     "build": "pnpm -r build",
-    "build:project": "concurrently -k -n DOCKER,STRIPE -c cyan,magenta \"docker compose up\" \"wait-on tcp:localhost:3001 && stripe listen --forward-to localhost:3001/webhooks/stripe\""
+    "run:dev": "concurrently -k -n DOCKER,STRIPE -c cyan,magenta \"docker compose up\" \"wait-on tcp:localhost:3001 && stripe listen --forward-to localhost:3001/webhooks/stripe\""
   },
   "keywords": [],
   "author": "",
