@@ -10,6 +10,9 @@ This project demonstrates an end-to-end web application with authentication, pay
 ---
 
 ## Quick Start Local
+
+Stripe CLI is required for local webhook testing: https://stripe.com/docs/stripe-cli
+
 1. `docker compose up`
 2. `pnpm db:seed:dev`
 3. `http://localhost:3000/`
