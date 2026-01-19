@@ -28,7 +28,6 @@ services:
       CORS_ORIGIN: "http://localhost:3000"
       DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/ecommerce"
       
-
       REDIS_HOST: "redis"
       REDIS_PORT: "6379"
       REDIS_PASSWORD: ""

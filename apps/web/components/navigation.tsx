@@ -19,7 +19,7 @@ export function Navigation() {
   // const isMobile = false;
 
   return (
-    <NavigationMenu className={robotoMono.className}>
+    <NavigationMenu className={robotoMono.className} viewport={false}>
       <NavigationMenuList className="flex-wrap">
         <NavigationMenuItem>
           <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>

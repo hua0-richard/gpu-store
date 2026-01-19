@@ -41,54 +41,65 @@ export default function GpuCatalogPage({
         : Object.entries(gpus).map(([key, value]) => ({ ...value, id: key }));
 
     return (
-        <div className="flex justify-center items-center w-full px-16">
-            <main className="flex max-w-7xl flex-col items-start justify-start bg-white dark:bg-black">
-                <div className="w-full">
+        <div className="flex min-h-screen w-full justify-center font-sans dark:bg-black">
+            <main className="flex min-h-screen w-full max-w-7xl flex-col items-start justify-start bg-white px-4 dark:bg-black md:px-8">
+                <div className="w-full mb-16 md:mb-24">
                     <NavigationBar />
                 </div>
-                <h1 className="font-semibold text-5xl pb-16">{title}</h1>
-                <div className="flex flex-wrap gap-8">
-                    {gpuList.map((gpu) => {
-                        // Use explicit ID or fallback to name-based ID if needed (though key-based is better)
-                        const linkId = gpu.id || gpu.name.toLowerCase().replace(/ /g, '-');
 
-                        return (
-                            <Card key={gpu.name} className="max-w-sm px-8">
-                                <CardTitle className="font-mono text-xl">{gpu.name}</CardTitle>
-                                <CardDescription>
-                                    Choose the plan that best fits your needs.
-                                </CardDescription>
-                                <CardContent>
-                                    <img src={imageSrc} alt={`${gpu.name} image`} />
-                                    <div className="flex flex-col justify-start">
-                                        <div>
-                                            <span className="font-mono font-semibold">
-                                                Architecture:{" "}
-                                            </span>
-                                            {gpu.architecture}
-                                        </div>
-                                        <div>
-                                            <span className="font-mono font-semibold">Memory: </span>
-                                            {gpu.memory}
-                                        </div>
-                                        <div>
-                                            <span className="font-mono font-semibold">Bandwidth: </span>
-                                            {gpu.memoryBandwidth}
-                                        </div>
+                <div className="w-full mb-16">
+                    <h1 className="font-semibold text-5xl mb-12">{title}</h1>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {gpuList.map((gpu) => {
+                            // Use explicit ID or fallback to name-based ID if needed (though key-based is better)
+                            const linkId = gpu.id || gpu.name.toLowerCase().replace(/ /g, '-');
+
+                            return (
+                                <Card key={gpu.name} className="w-full flex flex-col justify-between">
+                                    <div className="p-6 pb-0">
+                                        <CardTitle className="font-mono text-xl mb-2">{gpu.name}</CardTitle>
+                                        <CardDescription>
+                                            Choose the plan that best fits your needs.
+                                        </CardDescription>
                                     </div>
-                                </CardContent>
-                                <CardFooter>
-                                    <Link href={`${basePath}/${linkId}`}>
-                                        <Button>
-                                            <ArrowRight />
-                                        </Button>
-                                    </Link>
-                                </CardFooter>
-                            </Card>
-                        )
-                    })}
+                                    <CardContent className="p-6">
+                                        <div className="aspect-[4/3] relative mb-6 flex items-center justify-center overflow-hidden rounded-md bg-secondary/20">
+                                            <img src={imageSrc} alt={`${gpu.name} image`} className="object-contain h-full w-full p-4" />
+                                        </div>
+                                        <div className="flex flex-col justify-start space-y-2">
+                                            <div>
+                                                <span className="font-mono font-semibold">
+                                                    Architecture:{" "}
+                                                </span>
+                                                {gpu.architecture}
+                                            </div>
+                                            <div>
+                                                <span className="font-mono font-semibold">Memory: </span>
+                                                {gpu.memory}
+                                            </div>
+                                            <div>
+                                                <span className="font-mono font-semibold">Bandwidth: </span>
+                                                {gpu.memoryBandwidth}
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                    <CardFooter className="p-6 pt-0">
+                                        <Link href={`${basePath}/${linkId}`} className="w-full">
+                                            <Button className="w-full group">
+                                                Configure Now
+                                                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                            </Button>
+                                        </Link>
+                                    </CardFooter>
+                                </Card>
+                            )
+                        })}
+                    </div>
                 </div>
-                <Footer />
+
+                <div className="w-full mt-auto">
+                    <Footer />
+                </div>
             </main>
         </div>
     );

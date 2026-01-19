@@ -7,7 +7,7 @@ import Link from "next/link";
 import { ModeToggle } from "@/components/theme-toggle";
 import { useAuth, useSetAuth } from "@/components/auth-context";
 import { useRouter } from "next/navigation";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Spinner } from "@/components/ui/spinner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -63,19 +63,18 @@ export default function NavigationBar() {
         </Button>
 
         {loading ? (
-          <Button variant="outline" disabled className="flex items-center gap-2 w-[140px] justify-between">
-            <Skeleton className="h-4 w-4 rounded-full" />
-            <Skeleton className="h-4 w-[80px]" />
+          <Button variant="outline" disabled className="flex items-center justify-center w-[160px]">
+            <Spinner />
           </Button>
         ) : isAuthenticated ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex items-center gap-2 w-auto md:w-[140px] justify-between">
+              <Button variant="outline" className="flex items-center gap-2 w-auto md:w-[160px] px-2 justify-between">
                 <User className="h-4 w-4" />
-                <span className="w-[80px] truncate text-left hidden md:block">{user?.email}</span>
+                <span className="w-full truncate text-left hidden md:block">{user?.email}</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-0">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>

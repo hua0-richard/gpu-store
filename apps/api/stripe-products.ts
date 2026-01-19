@@ -1,71 +1,53 @@
-// seed-stripe-gpu-hourly.ts
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  // apiVersion: "2024-06-20", // optional: pin
 });
 
-type ProductInput = {
+type GpuModel = {
   vendor: "AMD" | "NVIDIA";
   gpuModel: string;
-  hourlyRateCents: number;
+
+  // Used by your server to compute dynamic price (cents per GPU-hour)
+  gpuHourlyRateCents: number;
+
   currency?: string;
 };
 
-const GPU_HOURLY: ProductInput[] = [
-  { vendor: "AMD", gpuModel: "MI300X", hourlyRateCents: 1200 },
-  { vendor: "AMD", gpuModel: "MI325X", hourlyRateCents: 1400 },
-  { vendor: "AMD", gpuModel: "MI355X", hourlyRateCents: 1600 },
-  { vendor: "AMD", gpuModel: "MI250X", hourlyRateCents: 1000 },
+const SEED_TAG = process.env.SEED_TAG ?? "gpu-dynamic-v1";
 
-  { vendor: "NVIDIA", gpuModel: "A100", hourlyRateCents: 1500 },
-  { vendor: "NVIDIA", gpuModel: "H100", hourlyRateCents: 2000 },
-  { vendor: "NVIDIA", gpuModel: "H200", hourlyRateCents: 2300 },
+const GPU_MODELS: GpuModel[] = [
+  { vendor: "AMD", gpuModel: "MI300X", gpuHourlyRateCents: 1200 },
+  { vendor: "AMD", gpuModel: "MI325X", gpuHourlyRateCents: 1400 },
+  { vendor: "AMD", gpuModel: "MI355X", gpuHourlyRateCents: 1600 },
+  { vendor: "AMD", gpuModel: "MI250X", gpuHourlyRateCents: 1000 },
+
+  { vendor: "NVIDIA", gpuModel: "A100", gpuHourlyRateCents: 1500 },
+  { vendor: "NVIDIA", gpuModel: "H100", gpuHourlyRateCents: 2000 },
+  { vendor: "NVIDIA", gpuModel: "H200", gpuHourlyRateCents: 2300 },
 ];
 
-function skuFor(vendor: string, gpuModel: string) {
+function modelSku(vendor: string, gpuModel: string) {
   return `${vendor}-${gpuModel}`.toUpperCase(); // e.g. NVIDIA-H100
 }
 
 function productName(vendor: string, gpuModel: string) {
-  return `${vendor} ${gpuModel} – GPU Hour`;
+  return `${vendor} ${gpuModel} – Compute (Hourly)`;
 }
 
 function productDescription(vendor: string, gpuModel: string) {
-  return `1 hour of GPU compute on ${vendor} ${gpuModel}. (Adjust quantity for hours.)`;
+  return `GPU compute for ${vendor} ${gpuModel}. Price is computed dynamically based on selected GPUs / vCPUs / storage / hours.`;
 }
 
-async function findActiveProductBySku(sku: string) {
+async function findActiveProductBySeedSku(seed: string, sku: string) {
   let startingAfter: string | undefined;
 
   while (true) {
     const page = await stripe.products.list({ limit: 100, starting_after: startingAfter });
-    const hit = page.data.find((p) => p.active && p.metadata?.sku === sku);
-    if (hit) return hit;
-
-    if (!page.has_more) return null;
-    startingAfter = page.data.at(-1)?.id;
-  }
-}
-
-async function findActiveHourlyPrice(productId: string, currency: string) {
-  let startingAfter: string | undefined;
-
-  while (true) {
-    const page = await stripe.prices.list({
-      limit: 100,
-      product: productId,
-      starting_after: startingAfter,
-      active: true,
-    });
 
     const hit = page.data.find(
-      (pr) =>
-        pr.active &&
-        pr.type === "one_time" &&
-        pr.currency === currency &&
-        pr.metadata?.unit === "hour"
+      (p) => p.active && p.metadata?.seed === seed && p.metadata?.sku === sku
     );
-
     if (hit) return hit;
 
     if (!page.has_more) return null;
@@ -73,91 +55,46 @@ async function findActiveHourlyPrice(productId: string, currency: string) {
   }
 }
 
-async function createProductWithHourlyPrice(input: ProductInput) {
-  const currency = (input.currency ?? "usd").toLowerCase();
-  const sku = skuFor(input.vendor, input.gpuModel);
+async function ensureModelProduct(model: GpuModel) {
+  const sku = modelSku(model.vendor, model.gpuModel);
 
-  console.log(`\n=== ${input.vendor} ${input.gpuModel} ===`);
-  console.log(`SKU: ${sku}`);
-
-  let product = await findActiveProductBySku(sku);
+  let product = await findActiveProductBySeedSku(SEED_TAG, sku);
 
   if (!product) {
-    console.log("Creating product...");
+    console.log(`Creating product: ${sku}`);
     product = await stripe.products.create({
-      name: productName(input.vendor, input.gpuModel),
-      description: productDescription(input.vendor, input.gpuModel),
+      name: productName(model.vendor, model.gpuModel),
+      description: productDescription(model.vendor, model.gpuModel),
       metadata: {
+        seed: SEED_TAG,
         sku,
-        vendor: input.vendor,
-        gpuModel: input.gpuModel,
+        vendor: model.vendor,
+        gpuModel: model.gpuModel,
+
+        // store your base rate for reference/debug (your app should still be the source of truth)
+        gpuHourlyRateCents: String(model.gpuHourlyRateCents),
+        pricing: "dynamic",
         unit: "hour",
       },
     });
-    console.log("✅ Product created:", product.id);
+    console.log(`✅ Product created: ${product.id}`);
   } else {
-    console.log("ℹ️ Product exists:", product.id);
+    console.log(`ℹ️ Product exists: ${sku} -> ${product.id}`);
   }
 
-  const existingPrice = await findActiveHourlyPrice(product.id, currency);
-
-  if (existingPrice) {
-    const existingAmount = existingPrice.unit_amount ?? undefined;
-
-    if (existingAmount !== input.hourlyRateCents) {
-      console.log(
-        `⚠️ Hourly price exists but amount differs (existing ${existingAmount} vs desired ${input.hourlyRateCents}).`
-      );
-      console.log("Deactivating old price and creating a new one...");
-
-      await stripe.prices.update(existingPrice.id, { active: false });
-
-      const newPrice = await stripe.prices.create({
-        product: product.id,
-        unit_amount: input.hourlyRateCents,
-        currency,
-        metadata: {
-          unit: "hour",
-          sku: `${sku}-HOUR`,
-        },
-      });
-
-      console.log("✅ New hourly price created:", newPrice.id);
-      return { productId: product.id, priceId: newPrice.id };
-    }
-
-    console.log("ℹ️ Hourly price exists:", existingPrice.id);
-    return { productId: product.id, priceId: existingPrice.id };
-  }
-
-  console.log("Creating hourly price...");
-  const price = await stripe.prices.create({
-    product: product.id,
-    unit_amount: input.hourlyRateCents,
-    currency,
-    metadata: {
-      unit: "hour",
-      sku: `${sku}-HOUR`,
-    },
-  });
-
-  console.log("✅ Hourly price created:", price.id);
-
-  return { productId: product.id, priceId: price.id };
+  return product;
 }
 
 async function main() {
-  if (!process.env.STRIPE_SECRET_KEY) {
-    throw new Error("Missing STRIPE_SECRET_KEY in env.");
+  if (!process.env.STRIPE_SECRET_KEY) throw new Error("Missing STRIPE_SECRET_KEY in env.");
+
+  console.log(`Seeding dynamic GPU products (seed=${SEED_TAG})...`);
+
+  for (const model of GPU_MODELS) {
+    await ensureModelProduct(model);
   }
 
-  console.log("Seeding Stripe GPU hourly products + prices...");
-
-  for (const input of GPU_HOURLY) {
-    await createProductWithHourlyPrice(input);
-  }
-
-  console.log("\n✅ Done.");
+  console.log("✅ Done.");
 }
 
 main().catch((err) => {

@@ -80,13 +80,13 @@ export default function GpuConfigPage({
     }
 
     return (
-        <div className="flex min-h-screen w-full flex-col font-sans dark:bg-black">
-            <div className="flex w-full flex-col items-center">
-                <div className="w-full max-w-7xl">
+        <div className="flex min-h-screen w-full justify-center font-sans dark:bg-black">
+            <main className="flex min-h-screen w-full max-w-7xl flex-col items-start justify-start bg-white px-4 dark:bg-black md:px-8">
+                <div className="w-full mb-16 md:mb-24">
                     <NavigationBar />
                 </div>
 
-                <main className="flex w-full max-w-7xl flex-col gap-8 px-6 py-10 lg:flex-row lg:px-8">
+                <div className="flex w-full flex-col gap-10 lg:flex-row mb-16">
                     {/* LEFT COLUMN - CONFIGURATION */}
                     <div className="flex flex-1 flex-col gap-10">
                         {/* Header */}
@@ -265,12 +265,12 @@ export default function GpuConfigPage({
                             </Card>
                         </div>
                     </div>
-                </main>
+                </div>
 
-                <div className="w-full max-w-7xl mt-auto">
+                <div className="w-full mt-auto">
                     <Footer />
                 </div>
-            </div>
+            </main>
         </div>
     );
 }
