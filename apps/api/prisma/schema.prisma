@@ -34,11 +34,18 @@ model Cart {
 
 model Compute {
   id    Int     @id @default(autoincrement())
-  user_id Int
+  userEmail String?
+  gpuModel String?
+  gpuQuant String?
+  storage String?
+  vCpu String?
+  hours String?
 }
 
 model PaymentEvents {
     id    Int     @id @default(autoincrement())
     eventId String @unique
     userEmail String
+    date DateTime @default(now())
+    product String?
 }

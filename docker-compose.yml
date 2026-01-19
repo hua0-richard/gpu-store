@@ -14,6 +14,8 @@ services:
 
   api:
     container_name: api
+    env_file:
+      - .env.dev
     build:
       context: .
       dockerfile: apps/api/Dockerfile
@@ -22,17 +24,6 @@ services:
     volumes:
       - ./apps/api:/app
       - /app/node_modules
-    environment:
-      NODE_ENV: development
-      PORT: 3001
-      CORS_ORIGIN: "http://localhost:3000"
-      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/ecommerce"
-      
-      REDIS_HOST: "redis"
-      REDIS_PORT: "6379"
-      REDIS_PASSWORD: ""
-      REDIS_URL: "redis://redis:6379"
-      FRONTEND_URL: "http://localhost:3000"
   postgres:
     image: postgres:15
     ports:
