@@ -9,6 +9,9 @@ This project demonstrates an end-to-end web application with authentication, pay
 
 ---
 
+## Demo
+![Demo screenshot](demo.png)
+
 ## Quick Start Local
 
 Stripe CLI is required for local webhook testing: https://stripe.com/docs/stripe-cli
