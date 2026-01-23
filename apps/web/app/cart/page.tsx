@@ -52,11 +52,11 @@ export default function CartPage() {
   return (
     <div className="flex min-h-screen w-full flex-col font-sans dark:bg-black">
       <div className="flex w-full flex-col items-center">
-        <div className="w-full max-w-7xl px-6 lg:px-8">
+        <div className="w-full max-w-7xl px-4 md:px-8">
           <NavigationBar />
         </div>
 
-        <main className="flex w-full max-w-7xl flex-col gap-8 px-6 py-10 lg:flex-row lg:px-8">
+        <main className="flex w-full max-w-7xl flex-col gap-8 px-4 py-10 md:px-8 lg:flex-row">
           {/* LEFT COLUMN - CART ITEMS */}
           <div className="flex flex-1 flex-col gap-6">
             <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -153,7 +153,7 @@ export default function CartPage() {
           </div>
         </main>
 
-        <div className="w-full max-w-7xl px-6 lg:px-8 mt-auto">
+        <div className="w-full max-w-7xl px-4 md:px-8 mt-auto">
           <Footer />
         </div>
       </div>

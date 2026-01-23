@@ -9,7 +9,6 @@ export default function NvidiaPage() {
     <GpuCatalogPage
       title="NVIDIA GPUs"
       gpus={gpus}
-      imageSrc="nvidia.png"
       basePath="/nvidia/config"
     />
   );

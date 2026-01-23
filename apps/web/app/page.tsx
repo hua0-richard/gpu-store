@@ -53,12 +53,10 @@ export default function Home() {
           <div className="flex flex-col gap-6 md:flex-row">
             <ProductCard
               computeProvider="NVIDIA"
-              imgResource="nvidia.png"
               href="/nvidia"
             />
             <ProductCard
               computeProvider="AMD"
-              imgResource="amd.png"
               href="/amd"
             />
           </div>
@@ -74,38 +72,47 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="mb-16 w-full bg-secondary md:mb-24">
-          <div className="h-full w-full px-4 py-16 md:px-14 md:py-24">
-            <div className="flex w-full flex-col items-center justify-between gap-8 md:flex-row md:gap-0">
-              <div className="w-full bg-primary px-2 py-2 text-secondary md:w-1/2">
-                <h1 className="text-3xl font-semibold md:text-5xl">Get Started Today</h1>
+        <div className="mb-16 w-full md:mb-24">
+          <div className="relative overflow-hidden px-6 py-16 md:px-16 md:py-24">
+            {/* Background Abstract Pattern - Subtle & Blended */}
+            <div className="absolute inset-0 z-0 opacity-0 transition-opacity duration-1000 dark:opacity-0" />
+
+            {/* Simple Divider Line Top/Bottom to define section slightly without box */}
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-zinc-200 to-transparent dark:via-white/10" />
+            <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-zinc-200 to-transparent dark:via-white/10" />
+
+            <div className="relative z-10 flex w-full flex-col items-start justify-between gap-12 md:flex-row md:items-center md:gap-0">
+              <div className="w-full md:w-1/2">
+                <h2 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-white md:text-6xl">
+                  Ready to <br className="hidden md:block" />
+                  <span className="text-zinc-400 dark:text-zinc-500">Scale Up?</span>
+                </h2>
               </div>
-              <div className="flex h-full w-full flex-col justify-between pl-0 md:w-1/2 md:pl-8">
-                <div className={`pb-8 ${robotoMono.className}`}>
-                  GPU compute in minutes. Simple setup. No complexity. No
-                  long-term commitments.
-                </div>
+
+              <div className="flex w-full flex-col items-start justify-end gap-8 md:w-1/2 md:items-end">
+                <p className={`max-w-md text-lg leading-relaxed text-zinc-600 dark:text-zinc-400 md:text-right ${robotoMono.className}`}>
+                  Deploy enterprise-grade GPU compute in minutes.
+                  Simple setup. No complexity. No long-term commitments.
+                </p>
+
                 <Button
                   className={`
                     group
-                    ${robotoMono.className}
-                    flex items-center gap-3
-                    px-5 py-4
+                    relative overflow-hidden
+                    rounded-full
+                    bg-zinc-900 text-white
+                    px-8 py-6
+                    text-lg font-medium
                     transition-all duration-300
-                    ease-[cubic-bezier(0.16,1,0.3,1)]
-                    hover:-translate-y-[1px]
+                    hover:bg-zinc-800 hover:shadow-xl hover:shadow-zinc-500/10
+                    dark:bg-white dark:text-black dark:hover:bg-zinc-200 dark:hover:shadow-white/10
+                    ${robotoMono.className}
                   `}
                 >
-                  <span className="transition-opacity duration-300 group-hover:opacity-90">
+                  <span className="flex items-center gap-3">
                     START BUILDING
+                    <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
                   </span>
-                  <ArrowRight
-                    className="
-                      transition-transform duration-300
-                      ease-[cubic-bezier(0.16,1,0.3,1)]
-                      group-hover:translate-x-1
-                    "
-                  />
                 </Button>
               </div>
             </div>

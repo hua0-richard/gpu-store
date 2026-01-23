@@ -90,13 +90,62 @@ export default function GpuConfigPage({
                     {/* LEFT COLUMN - CONFIGURATION */}
                     <div className="flex flex-1 flex-col gap-10">
                         {/* Header */}
-                        <div className="space-y-3">
-                            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+                        <div className="space-y-6">
+                            <h1 className="text-5xl font-bold tracking-tighter sm:text-6xl">
                                 Configure {gpu.name}
                             </h1>
-                            <p className={cn("text-lg text-muted-foreground leading-relaxed max-w-2xl", robotoMono.className)}>
-                                {gpu.architecture} Architecture / {gpu.memory} {gpu.memoryType}
-                            </p>
+
+                            {/* Visual Datasheet Hero */}
+                            <div className="aspect-[2/1] w-full max-w-xl relative flex flex-col items-stretch overflow-hidden rounded-md border border-zinc-200 bg-zinc-50 dark:border-white/10 dark:bg-zinc-900/50">
+                                {/* Header: Architecture */}
+                                <div className="flex w-full items-center justify-between border-b border-zinc-200 px-4 py-3 dark:border-white/10">
+                                    <div className="flex items-center gap-2">
+                                        <div className="h-1.5 w-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600" />
+                                        <span className={`text-[10px] font-semibold text-zinc-500 uppercase tracking-widest ${robotoMono.className}`}>
+                                            {gpu.architecture}
+                                        </span>
+                                    </div>
+                                    <div className={`text-[10px] font-semibold text-zinc-400 uppercase tracking-widest ${robotoMono.className}`}>
+                                        High Performance Compute
+                                    </div>
+                                </div>
+
+                                {/* Body: VRAM Hero (w/ Dot Pattern) */}
+                                <div className="relative flex flex-1 flex-col items-center justify-center">
+                                    {/* Abstract Dot Pattern */}
+                                    <div className="absolute inset-0 z-0 opacity-30 dark:opacity-20 pointer-events-none">
+                                        <div
+                                            className="absolute inset-0 bg-[radial-gradient(#00000040_1px,transparent_1px)] dark:bg-[radial-gradient(#ffffff40_1px,transparent_1px)]"
+                                            style={{ backgroundSize: '16px 16px' }}
+                                        />
+                                    </div>
+
+                                    <div className="relative z-10 flex flex-col items-center gap-2">
+                                        <span className={`text-6xl font-bold tracking-tighter text-zinc-900 dark:text-white ${robotoMono.className}`}>
+                                            {gpu.memory.split(' ')[0]}
+                                        </span>
+                                        <span className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">
+                                            {gpu.memory.split(' ').slice(1).join(' ') || 'VRAM'}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Footer: Power & Bandwidth */}
+                                <div className="grid w-full grid-cols-2 divide-x divide-zinc-200 border-t border-zinc-200 dark:divide-white/10 dark:border-white/10">
+                                    <div className="flex flex-col items-center justify-center py-3">
+                                        <span className="text-[10px] font-medium text-zinc-400 uppercase">Power</span>
+                                        <span className={`text-sm font-semibold text-zinc-700 dark:text-zinc-300 ${robotoMono.className}`}>
+                                            {gpu.power || 'N/A'}
+                                        </span>
+                                    </div>
+                                    <div className="flex flex-col items-center justify-center py-3">
+                                        <span className="text-[10px] font-medium text-zinc-400 uppercase">Bandwidth</span>
+                                        <span className={`text-sm font-semibold text-zinc-700 dark:text-zinc-300 ${robotoMono.className}`}>
+                                            {gpu.memoryBandwidth || 'N/A'}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div className="h-px w-full bg-border" />
@@ -212,56 +261,72 @@ export default function GpuConfigPage({
                     {/* RIGHT COLUMN - SUMMARY */}
                     <div className="w-full lg:w-[360px]">
                         <div className="sticky top-8">
-                            <Card className="border border-border/60 shadow-none bg-card/50 backdrop-blur-sm">
-                                <CardHeader className="pb-4">
-                                    <CardTitle className="text-xl font-medium">Summary</CardTitle>
-                                    <CardDescription>Estimated cost breakdown</CardDescription>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    {/* Items List */}
-                                    <div className="space-y-3">
-                                        <div className="flex justify-between items-center text-sm">
-                                            <span className="text-muted-foreground">GPU Model</span>
-                                            <span className="font-medium">{quantity}x {gpu.name}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center text-sm">
-                                            <span className="text-muted-foreground">Processor</span>
-                                            <span className="font-medium">{cpus} vCPUs</span>
-                                        </div>
-                                        <div className="flex justify-between items-center text-sm">
-                                            <span className="text-muted-foreground">Storage</span>
-                                            <span className="font-medium">{storage} GB NVMe</span>
-                                        </div>
-                                        <div className="flex justify-between items-center text-sm">
-                                            <span className="text-muted-foreground">Duration</span>
-                                            <span className="font-medium">{hours} Hours</span>
-                                        </div>
-                                    </div>
+                            <Card className="relative overflow-hidden border border-zinc-200 bg-white shadow-none transition-all duration-500 dark:border-white/10 dark:bg-zinc-900/50">
+                                {/* Abstract Background Pattern */}
+                                <div className="absolute inset-0 z-0 opacity-40 pointer-events-none">
+                                    <div
+                                        className="absolute inset-0 bg-[radial-gradient(#00000040_1px,transparent_1px)] dark:bg-[radial-gradient(#ffffff40_1px,transparent_1px)]"
+                                        style={{ backgroundSize: '24px 24px' }}
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-white via-white/80 to-transparent dark:from-black dark:via-zinc-950/80" />
+                                </div>
 
-                                    <div className="h-px w-full bg-border/50" />
+                                {/* Brand/Product Highlight Glow */}
+                                <div
+                                    className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-zinc-900/5 blur-3xl transition-all duration-700 dark:bg-white/5 pointer-events-none"
+                                />
 
-                                    {/* Pricing */}
-                                    <div className="space-y-1 pt-1">
-                                        <div className="flex justify-between items-end">
-                                            <span className="text-xs text-muted-foreground">Hourly Rate</span>
-                                            <span className={cn("text-lg font-medium", robotoMono.className)}>
-                                                ${hourlyRate.toFixed(2)}
-                                            </span>
+                                <div className="relative z-10">
+                                    <CardHeader className="pb-4">
+                                        <CardTitle className="text-xl font-medium">Summary</CardTitle>
+                                        <CardDescription>Estimated cost breakdown</CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        {/* Items List */}
+                                        <div className="space-y-3">
+                                            <div className="flex justify-between items-center text-sm">
+                                                <span className="text-muted-foreground">GPU Model</span>
+                                                <span className="font-medium">{quantity}x {gpu.name}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-sm">
+                                                <span className="text-muted-foreground">Processor</span>
+                                                <span className="font-medium">{cpus} vCPUs</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-sm">
+                                                <span className="text-muted-foreground">Storage</span>
+                                                <span className="font-medium">{storage} GB NVMe</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-sm">
+                                                <span className="text-muted-foreground">Duration</span>
+                                                <span className="font-medium">{hours} Hours</span>
+                                            </div>
                                         </div>
-                                        <div className="flex justify-between items-end mt-4">
-                                            <span className="text-base font-medium">Total Estimated</span>
-                                            <span className={cn("text-3xl font-semibold tracking-tight text-primary", robotoMono.className)}>
-                                                ${totalCost.toFixed(2)}
-                                            </span>
+
+                                        <div className="h-px w-full bg-border/50" />
+
+                                        {/* Pricing */}
+                                        <div className="space-y-1 pt-1">
+                                            <div className="flex justify-between items-end">
+                                                <span className="text-xs text-muted-foreground">Hourly Rate</span>
+                                                <span className={cn("text-lg font-medium", robotoMono.className)}>
+                                                    ${hourlyRate.toFixed(2)}
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between items-end mt-4">
+                                                <span className="text-base font-medium">Total Estimated</span>
+                                                <span className={cn("text-3xl font-semibold tracking-tight text-primary", robotoMono.className)}>
+                                                    ${totalCost.toFixed(2)}
+                                                </span>
+                                            </div>
                                         </div>
-                                    </div>
-                                </CardContent>
-                                <CardFooter className="pt-2 pb-6">
-                                    <Button className="w-full h-11 text-base font-medium tracking-wide group rounded-md">
-                                        Deploy Cluster
-                                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                                    </Button>
-                                </CardFooter>
+                                    </CardContent>
+                                    <CardFooter className="pt-2 pb-6">
+                                        <Button className="w-full h-11 text-base font-medium tracking-wide group rounded-md">
+                                            Deploy Cluster
+                                            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                        </Button>
+                                    </CardFooter>
+                                </div>
                             </Card>
                         </div>
                     </div>

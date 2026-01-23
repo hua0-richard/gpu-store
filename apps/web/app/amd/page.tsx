@@ -9,7 +9,6 @@ export default function AmdPage() {
     <GpuCatalogPage
       title="AMD GPUs"
       gpus={gpus}
-      imageSrc="amd-gpu.png"
       basePath="/amd/config"
     />
   );
