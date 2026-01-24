@@ -11,6 +11,9 @@ import Footer from "@/components/footer";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default function AccountPage() {
     const { user, isAuthenticated, loading } = useAuth();
     const setAuth = useSetAuth();
