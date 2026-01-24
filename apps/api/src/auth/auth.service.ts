@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException, NotFoundException, Unauthoriz
 import { UsersService } from '../users/users.service';
 import { RefreshSessionsService } from 'src/refresh-sessions/refresh-sessions.service';
 import { JwtService } from '@nestjs/jwt';
-import { randomBytes } from 'crypto';
+import { randomBytes, randomUUID } from 'crypto';
 import bcrypt from 'bcrypt';
 const nodemailer = require('nodemailer');
 
@@ -23,11 +23,11 @@ export class AuthService {
   }
 
   async createRefreshTokenEntry(email: string): Promise<string> {
-    const sessionId = crypto.randomUUID();
+    const sessionId = randomUUID();
     const refreshToken = await this.generateRefreshToken();
     const refreshTokenHash = await this.generateRefreshHash(refreshToken);
 
-    const tokenResult = await this.refreshSessionsService.createOne(sessionId, email, refreshTokenHash);
+    await this.refreshSessionsService.createOne(sessionId, email, refreshTokenHash);
 
     return `${sessionId}.${refreshToken}`;
   }
@@ -98,6 +98,9 @@ export class AuthService {
 
   async refreshAccessToken(refreshToken: string): Promise<{access_token: string}> {
     const [sessionId, token] = refreshToken.split(".");
+    if (!sessionId || !token) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
     const refreshTokenResult = await this.refreshSessionsService.findOneToken(sessionId, token)
     if (!refreshTokenResult) {
       throw new UnauthorizedException('Invalid refresh token')
@@ -111,9 +114,13 @@ export class AuthService {
 
   async revokeRefreshToken(refreshToken: string): Promise<void> {
       const [sessionId, token] = refreshToken.split(".");
-      const revokeUserToken = this.refreshSessionsService.revokeOneToken(sessionId);
-      if (!revokeUserToken) {
-        return
+      if (!sessionId || !token) {
+        return;
       }
+      const refreshTokenResult = await this.refreshSessionsService.findOneToken(sessionId, token);
+      if (!refreshTokenResult) {
+        return;
+      }
+      await this.refreshSessionsService.revokeOneToken(sessionId);
   }
 }

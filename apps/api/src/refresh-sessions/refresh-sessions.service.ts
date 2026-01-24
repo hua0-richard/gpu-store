@@ -45,7 +45,11 @@ export class RefreshSessionsService {
       return;
     }
 
-    if (Date.now() < isValidRefreshToken.expiresAt) {
+    if (userRefreshSession.revokedAt) {
+      return;
+    }
+
+    if (Date.now() > userRefreshSession.expiresAt.getTime()) {
       return;
     }
 
