@@ -14,6 +14,7 @@ model User {
   name  String?
   sessions RefreshSession[]
   orders Order[]
+  instances Instance[]
 }
 
 model RefreshSession {
@@ -46,6 +47,7 @@ model Order {
   createdAt DateTime    @default(now())
   
   items     OrderItem[]
+  instances Instance[]
 }
 
 model OrderItem {
@@ -62,4 +64,25 @@ model OrderItem {
   cpus      String?
   storage   String?
   hours     String?
+}
+
+model Instance {
+  id        String   @id @default(uuid())
+  
+  userEmail String
+  user      User     @relation(fields: [userEmail], references: [email])
+  
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id])
+  
+  name      String   // e.g. "worker-01"
+  type      String   // e.g. "nvidia-a100"
+  status    String   // "PROVISIONING", "RUNNING", "STOPPED", "TERMINATED"
+  ipAddress String?
+  region    String   @default("us-east-1")
+  
+  // metrics removed per user request
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

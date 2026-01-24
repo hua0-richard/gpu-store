@@ -2,7 +2,7 @@
 
 import { Navigation } from "@/components/navigation";
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, User, Menu } from "lucide-react";
+import { ShoppingBag, User, Menu, LayoutDashboard, LogOut } from "lucide-react";
 import Link from "next/link";
 import { ModeToggle } from "@/components/theme-toggle";
 import { useAuth, useSetAuth } from "@/components/auth-context";
@@ -76,10 +76,19 @@ export default function NavigationBar() {
         <Navigation></Navigation>
       </div>
 
-      <div className="flex items-center gap-1">
-        <ModeToggle></ModeToggle>
+      <div className="flex items-center gap-2">
+        <ModeToggle />
+
+        {isAuthenticated && (
+          <Button variant="ghost" size="icon" asChild>
+            <Link href="/dashboard" aria-label="Dashboard">
+              <LayoutDashboard className="h-5 w-5" />
+            </Link>
+          </Button>
+        )}
+
         <Button variant="ghost" size="icon" asChild className="relative">
-          <Link href="/cart">
+          <Link href="/cart" aria-label="Cart">
             <ShoppingBag className="h-5 w-5" />
             {cartCount > 0 && (
               <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
@@ -90,36 +99,37 @@ export default function NavigationBar() {
         </Button>
 
         {loading ? (
-          <Button variant="ghost" disabled className="w-10 px-0">
+          <Button variant="ghost" size="icon" disabled>
             <Spinner />
           </Button>
         ) : isAuthenticated ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-2 pl-2 pr-4 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 ml-2">
-                <div className="h-6 w-6 rounded-full bg-white dark:bg-black flex items-center justify-center shadow-sm">
-                  <User className="h-3 w-3" />
-                </div>
-                <span className="max-w-[100px] truncate text-xs font-medium hidden md:block">{user?.email?.split('@')[0]}</span>
+              <Button variant="ghost" size="icon" className="rounded-full">
+                <User className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuLabel className="font-normal text-xs text-muted-foreground p-2 pb-0">
+                {user?.email}
+              </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link href="/account" className="cursor-pointer w-full">
+                <Link href="/account" className="cursor-pointer w-full flex items-center gap-2">
+                  <User className="h-4 w-4" />
                   Profile
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                className="cursor-pointer text-red-500 focus:text-red-500"
+                className="cursor-pointer text-red-500 focus:text-red-500 flex items-center gap-2"
                 onClick={async () => {
                   await logout();
                   setAuth({ isAuthenticated: false, user: null, loading: false });
                   router.replace("/");
                 }}
               >
+                <LogOut className="h-4 w-4" />
                 Log Out
               </DropdownMenuItem>
             </DropdownMenuContent>

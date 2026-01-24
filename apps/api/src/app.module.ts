@@ -9,8 +9,20 @@ import { StripeModule } from './stripe/stripe.module';
 import { PaymentsModule } from './payments/payments.module';
 import { OrdersModule } from './orders/orders.module';
 
+import { ScheduleModule } from '@nestjs/schedule';
+import { InstancesModule } from './instances/instances.module';
+
 @Module({
-  imports: [AuthModule, UsersModule, RefreshSessionsModule, StripeModule, PaymentsModule, OrdersModule],
+  imports: [
+    ScheduleModule.forRoot(),
+    AuthModule,
+    UsersModule,
+    RefreshSessionsModule,
+    StripeModule,
+    PaymentsModule,
+    OrdersModule,
+    InstancesModule
+  ],
   controllers: [AppController, HealthCheckController],
   providers: [AppService],
 })

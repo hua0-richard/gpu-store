@@ -17,11 +17,6 @@ export function Navigation() {
   return (
     <NavigationMenu className={robotoMono.className} viewport={false}>
       <NavigationMenuList className="flex-wrap">
-        <NavigationMenuItem>
-          <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-            <Link href="/">Home</Link>
-          </NavigationMenuLink>
-        </NavigationMenuItem>
         <NavigationMenuItem className="block">
           <NavigationMenuTrigger>AMD</NavigationMenuTrigger>
           <NavigationMenuContent>
@@ -106,6 +101,6 @@ export function Navigation() {
           </NavigationMenuContent>
         </NavigationMenuItem>
       </NavigationMenuList>
-    </NavigationMenu>
+    </NavigationMenu >
   );
 }

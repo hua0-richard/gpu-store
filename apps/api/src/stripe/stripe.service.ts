@@ -1,12 +1,17 @@
 import { Injectable, Post } from '@nestjs/common';
 import { PaymentsService } from 'src/payments/payments.service';
 import { LockService } from 'src/redis/lock.service';
+import { InstancesService } from 'src/instances/instances.service';
 import Stripe from 'stripe';
 import { prisma } from '../../lib/prisma';
 
 @Injectable()
 export class StripeService {
-  constructor(private lockService: LockService, private paymentsService: PaymentsService) { }
+  constructor(
+    private lockService: LockService,
+    private paymentsService: PaymentsService,
+    private instancesService: InstancesService
+  ) { }
 
   async handleStripeEvent(stripeEvent: Stripe.Event) {
     if (!stripeEvent.id) {
@@ -70,8 +75,13 @@ export class StripeService {
                 }),
               },
             },
+            include: { items: true } // Include items so we can pass them to instances service
           });
           console.log('Order created successfully:', order.id);
+
+          // Provision Instances
+          console.log('Provisioning instances...');
+          await this.instancesService.createFromOrder(order, userEmail);
           break;
         }
         case 'payment_intent.succeeded': {
