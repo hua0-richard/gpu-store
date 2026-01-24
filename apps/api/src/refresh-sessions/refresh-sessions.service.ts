@@ -49,7 +49,7 @@ export class RefreshSessionsService {
       return;
     }
 
-    if (Date.now() > userRefreshSession.expiresAt.getTime()) {
+    if (!userRefreshSession.expiresAt || Date.now() > userRefreshSession.expiresAt.getTime()) {
       return;
     }
 

@@ -9,7 +9,7 @@
     "lint": "pnpm -r lint",
     "build": "pnpm -r build",
     "docker:up": "docker compose up",
-    "stripe:listen": "wait-on tcp:localhost:3001 && stripe listen --forward-to=http://localhost:3001/webhooks/stripe",
+    "stripe:listen": "wait-on tcp:localhost:3001 && stripe login && stripe listen --forward-to=http://localhost:3001/webhooks/stripe",
     "run:dev": "concurrently -k -n DOCKER,STRIPE -c cyan,magenta npm:docker:up npm:stripe:listen"
   },
   "keywords": [],
