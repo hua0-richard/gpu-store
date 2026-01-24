@@ -6,6 +6,7 @@ import { ShoppingBag, User, Menu } from "lucide-react";
 import Link from "next/link";
 import { ModeToggle } from "@/components/theme-toggle";
 import { useAuth, useSetAuth } from "@/components/auth-context";
+import { useCart } from "@/components/cart-context";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -19,6 +20,7 @@ import {
 
 export default function NavigationBar() {
   const { loading, isAuthenticated, user } = useAuth();
+  const { cartCount } = useCart();
   const setAuth = useSetAuth();
   const router = useRouter();
   const logout = async () => {
@@ -76,9 +78,14 @@ export default function NavigationBar() {
 
       <div className="flex items-center gap-1">
         <ModeToggle></ModeToggle>
-        <Button variant="ghost" size="icon" asChild>
+        <Button variant="ghost" size="icon" asChild className="relative">
           <Link href="/cart">
             <ShoppingBag className="h-5 w-5" />
+            {cartCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
+                {cartCount}
+              </span>
+            )}
           </Link>
         </Button>
 
@@ -96,7 +103,7 @@ export default function NavigationBar() {
                 <span className="max-w-[100px] truncate text-xs font-medium hidden md:block">{user?.email?.split('@')[0]}</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-0">
+            <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
@@ -107,8 +114,8 @@ export default function NavigationBar() {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="cursor-pointer text-red-500 focus:text-red-500"
-                onClick={() => {
-                  logout();
+                onClick={async () => {
+                  await logout();
                   setAuth({ isAuthenticated: false, user: null, loading: false });
                   router.replace("/");
                 }}

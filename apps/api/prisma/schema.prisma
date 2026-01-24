@@ -13,6 +13,7 @@ model User {
   password String
   name  String?
   sessions RefreshSession[]
+  orders Order[]
 }
 
 model RefreshSession {
@@ -27,25 +28,38 @@ model RefreshSession {
 
 }
 
-model Cart {
-  id    Int     @id @default(autoincrement())
-  user_id Int
-}
-
-model Compute {
-  id    Int     @id @default(autoincrement())
-  userEmail String?
-  gpuModel String?
-  gpuQuant String?
-  storage String?
-  vCpu String?
-  hours String?
-}
-
 model PaymentEvents {
-    id    Int     @id @default(autoincrement())
-    eventId String @unique
-    userEmail String
-    date DateTime @default(now())
-    product String?
+  id    Int     @id @default(autoincrement())
+  eventId String @unique
+  userEmail String
+  date DateTime @default(now())
+  product String?
+}
+
+model Order {
+  id        String      @id @default(uuid())
+  userEmail String
+  user      User        @relation(fields: [userEmail], references: [email])
+  amount    Int         // Amount in cents
+  currency  String      @default("usd")
+  status    String      // e.g. "succeeded", "pending"
+  createdAt DateTime    @default(now())
+  
+  items     OrderItem[]
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  
+  name      String
+  quantity  Int
+  price     Int     // Price in cents
+  
+  // Snapshot of configuration
+  gpuId     String?
+  cpus      String?
+  storage   String?
+  hours     String?
 }

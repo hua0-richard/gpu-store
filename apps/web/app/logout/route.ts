@@ -9,8 +9,8 @@ export async function POST() {
     maxAge: 0,
     path: "/",
     httpOnly: true,
-    secure: true,
-    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
   });
 
   const cookieHeader = (await headers()).get("cookie") ?? "";
@@ -26,8 +26,8 @@ export async function POST() {
     maxAge: 0,
     path: "/",
     httpOnly: true,
-    secure: true,
-    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
   });
 
   return res;

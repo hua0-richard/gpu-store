@@ -3,7 +3,6 @@ import Link from "next/link";
 import { robotoMono } from "@/app/fonts";
 import { ArrowRight } from "lucide-react";
 
-// import { useIsMobile } from "@/hooks/use-mobile"
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -15,9 +14,6 @@ import {
 } from "@/components/ui/navigation-menu";
 
 export function Navigation() {
-  //  const isMobile = useIsMobile()
-  // const isMobile = false;
-
   return (
     <NavigationMenu className={robotoMono.className} viewport={false}>
       <NavigationMenuList className="flex-wrap">

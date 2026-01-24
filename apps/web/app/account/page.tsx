@@ -1,11 +1,13 @@
 "use client";
 
+import { useEffect, useState, useMemo } from "react";
 import { useAuth, useSetAuth } from "@/components/auth-context";
+import { fetchWithAuth } from "@/lib/api";
+import { useCart } from "@/components/cart-context";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import NavigationBar from "@/components/navigation-bar";
 import Footer from "@/components/footer";
-import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
@@ -13,12 +15,82 @@ export default function AccountPage() {
     const { user, isAuthenticated, loading } = useAuth();
     const setAuth = useSetAuth();
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const { clearCart } = useCart();
+
+    // Orders State - Moved to top level
+    const [orders, setOrders] = useState<any[]>([]);
+
+    // Calculate Compute Hours from Orders
+    const computeHours = useMemo(() => {
+        const totals: Record<string, number> = {};
+
+        orders.forEach(order => {
+            // Only count successful orders
+            if (order.status === 'succeeded' || order.status === 'complete' || order.status === 'paid') {
+                order.items?.forEach((item: any) => {
+                    const hours = parseFloat(item.hours || "0");
+                    const qty = item.quantity || 1;
+                    const name = item.name || "Unknown GPU";
+
+                    if (hours > 0) {
+                        if (!totals[name]) totals[name] = 0;
+                        totals[name] += hours * qty;
+                    }
+                });
+            }
+        });
+
+        // Convert to array
+        const result = Object.entries(totals).map(([type, hours]) => ({ type, hours }));
+        if (result.length === 0) {
+            return [
+                { type: "No Active Compute", hours: 0 },
+            ];
+        }
+        return result;
+    }, [orders]);
 
     useEffect(() => {
         if (!loading && !isAuthenticated) {
             router.replace("/login");
         }
     }, [loading, isAuthenticated, router]);
+
+    // Handle success from Stripe
+    useEffect(() => {
+        const successParam = searchParams.get("success");
+        console.log("AccountPage URL Params:", successParam);
+
+        if (successParam === "true") {
+            console.log("Success param detected. Clearing cart...");
+            clearCart();
+            // Optional: Remove query param without reload
+            router.replace("/account");
+        }
+    }, [searchParams, clearCart, router]);
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'}/orders`)
+                .then(res => {
+                    if (!res.ok) throw new Error("Failed to fetch");
+                    return res.json();
+                })
+                .then(data => {
+                    if (Array.isArray(data)) {
+                        setOrders(data);
+                    } else {
+                        console.error("Orders data is not an array:", data);
+                        setOrders([]);
+                    }
+                })
+                .catch(err => {
+                    console.error("Failed to fetch orders", err);
+                    setOrders([]);
+                });
+        }
+    }, [isAuthenticated]);
 
     const logout = async () => {
         await fetch("/logout", {
@@ -38,21 +110,8 @@ export default function AccountPage() {
     }
 
     if (!isAuthenticated) {
-        return null;
+        return null; // Or return loading state or empty div while redirecting
     }
-
-    // Placeholder data
-    const purchaseHistory = [
-        { id: "ORD-001", date: "2023-10-15", item: "NVIDIA A100 Cluster", amount: "$5,250.00", status: "Completed" },
-        { id: "ORD-002", date: "2023-11-02", item: "AMD MI250X Cluster", amount: "$3,750.00", status: "Active" },
-    ];
-
-    const computeHours = [
-        { type: "NVIDIA A100", hours: 42.5 },
-        { type: "NVIDIA H100", hours: 0 },
-        { type: "AMD MI250X", hours: 128.0 },
-        { type: "AMD MI300X", hours: 10.0 },
-    ];
 
     return (
         <div className="flex min-h-screen w-full justify-center font-sans dark:bg-black">
@@ -156,18 +215,28 @@ export default function AccountPage() {
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {purchaseHistory.map((order) => (
+                                            {orders.map((order) => (
                                                 <TableRow key={order.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800">
-                                                    <TableCell className="font-medium font-mono">{order.id}</TableCell>
-                                                    <TableCell>{order.date}</TableCell>
-                                                    <TableCell>{order.item}</TableCell>
+                                                    <TableCell className="font-medium font-mono text-xs">{order.id.slice(0, 8)}...</TableCell>
+                                                    <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
                                                     <TableCell>
-                                                        <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium border ${order.status === "Active" ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800" : "bg-zinc-50 text-zinc-600 border-zinc-200 dark:bg-zinc-900/50 dark:text-zinc-400 dark:border-zinc-800"
+                                                        {order.items?.map((item: any) => (
+                                                            <div key={item.id}>
+                                                                {item.quantity}x {item.name}
+                                                            </div>
+                                                        ))}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium border ${order.status === "complete" || order.status === "succeeded" || order.status === "paid" // Stripe statuses vary
+                                                            ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800"
+                                                            : "bg-zinc-50 text-zinc-600 border-zinc-200 dark:bg-zinc-900/50 dark:text-zinc-400 dark:border-zinc-800"
                                                             }`}>
                                                             {order.status}
                                                         </div>
                                                     </TableCell>
-                                                    <TableCell className="text-right font-mono">{order.amount}</TableCell>
+                                                    <TableCell className="text-right font-mono">
+                                                        ${(order.amount / 100).toFixed(2)}
+                                                    </TableCell>
                                                 </TableRow>
                                             ))}
                                         </TableBody>

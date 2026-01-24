@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/components/auth-context";
+import { CartProvider } from "@/components/cart-context";
+import { ToastProvider } from "@/components/toast-context";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -15,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Compute",
+  title: "Tensor",
   description: "High performance GPU compute instances for all your needs.  ",
 };
 
@@ -35,7 +37,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AuthProvider>{children}</AuthProvider>
+          <CartProvider>
+            <AuthProvider>
+              <ToastProvider>
+                {children}
+              </ToastProvider>
+            </AuthProvider>
+          </CartProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -20,4 +20,4 @@ import { RefreshSessionsModule } from '../refresh-sessions/refresh-sessions.modu
   controllers: [AuthController],
   exports: [AuthService],
 })
-export class AuthModule {}
+export class AuthModule { }

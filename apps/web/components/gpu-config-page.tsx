@@ -16,6 +16,9 @@ import NavigationBar from "@/components/navigation-bar";
 import Footer from "@/components/footer";
 import { cn } from "@/lib/utils";
 import { robotoMono } from "@/app/fonts";
+import { useCart } from "@/components/cart-context";
+import { useToast } from "@/components/toast-context";
+import { fetchWithAuth } from "@/lib/api";
 
 const CPU_OPTIONS = [
     { value: 12, label: "12 vCPUs" },
@@ -56,6 +59,8 @@ export default function GpuConfigPage({
     const [cpus, setCpus] = useState(24);
     const [storage, setStorage] = useState(500);
     const [hours, setHours] = useState(24);
+    const { addItem } = useCart();
+    const { toast } = useToast();
 
     const hourlyRate = useMemo(() => {
         const base = pricingBase[gpuId] || pricingBase.default || 3.00;
@@ -320,10 +325,63 @@ export default function GpuConfigPage({
                                             </div>
                                         </div>
                                     </CardContent>
-                                    <CardFooter className="pt-2 pb-6">
-                                        <Button className="w-full h-11 text-base font-medium tracking-wide group rounded-md">
+                                    <CardFooter className="pt-2 pb-6 flex flex-col gap-3">
+                                        <Button
+                                            onClick={async () => {
+                                                try {
+                                                    const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'}/webhooks/stripe/checkout`, {
+                                                        method: "POST",
+                                                        headers: { "Content-Type": "application/json" },
+                                                        body: JSON.stringify({
+                                                            items: [{
+                                                                name: gpu.name,
+                                                                gpuId,
+                                                                quantity,
+                                                                cpus,
+                                                                storage,
+                                                                hours,
+                                                                pricePerStep: hourlyRate,
+                                                                architecture: gpu.architecture,
+                                                                memory: gpu.memory,
+                                                            }]
+                                                        }),
+                                                    });
+                                                    if (!res.ok) {
+                                                        const errorText = await res.text();
+                                                        throw new Error(`Checkout failed: ${res.status} ${errorText}`);
+                                                    }
+                                                    const { url } = await res.json();
+                                                    window.location.href = url;
+                                                } catch (err: any) {
+                                                    console.error(err);
+                                                    toast(`Failed to start checkout: ${err.message}`, "error");
+                                                }
+                                            }}
+                                            className="w-full h-11 text-base font-medium tracking-wide group rounded-md"
+                                        >
                                             Deploy Cluster
                                             <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => {
+                                                addItem({
+                                                    name: gpu.name,
+                                                    gpuId,
+                                                    quantity,
+                                                    cpus,
+                                                    storage,
+                                                    hours,
+                                                    pricePerStep: hourlyRate,
+                                                    totalPrice: totalCost,
+                                                    architecture: gpu.architecture,
+                                                    memory: gpu.memory,
+                                                });
+                                                toast("Added to Cart!", "success");
+                                            }}
+                                            className="w-full h-11 text-base font-medium tracking-wide rounded-md"
+                                        >
+                                            Add to Cart
                                         </Button>
                                     </CardFooter>
                                 </div>

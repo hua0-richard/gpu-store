@@ -23,27 +23,16 @@ import Footer from "@/components/footer";
 import { robotoMono } from "@/app/fonts";
 import { cn } from "@/lib/utils";
 
-// Mock Data
-const cartItems = [
-  {
-    id: 1,
-    name: "NVIDIA H100 80GB HBM3",
-    price: 4500.0,
-    quantity: 1,
-    image: "/nvidia/h100.jpg",
-  },
-  {
-    id: 2,
-    name: "AMD Instinct MI300X",
-    price: 3800.0,
-    quantity: 2,
-    image: "/amd/mi300x.jpg",
-  },
-];
+import { fetchWithAuth } from "@/lib/api";
+import { useCart } from "@/components/cart-context";
+import { useToast } from "@/components/toast-context";
 
 export default function CartPage() {
-  const subtotal = cartItems.reduce(
-    (acc, item) => acc + item.price * item.quantity,
+  const { items, removeItem } = useCart();
+  const { toast } = useToast();
+
+  const subtotal = items.reduce(
+    (acc, item) => acc + item.totalPrice,
     0,
   );
   const tax = subtotal * 0.1; // 10% tax
@@ -52,7 +41,7 @@ export default function CartPage() {
   return (
     <div className="flex min-h-screen w-full flex-col font-sans dark:bg-black">
       <div className="flex w-full flex-col items-center">
-        <div className="w-full max-w-7xl px-4 md:px-8">
+        <div className="relative z-50 w-full max-w-7xl px-4 md:px-8">
           <NavigationBar />
         </div>
 
@@ -75,39 +64,51 @@ export default function CartPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {cartItems.map((item) => (
-                    <TableRow key={item.id} className="hover:bg-transparent border-border/60">
-                      <TableCell className="py-4 pl-6">
-                        <div className="relative w-16 h-16 bg-secondary rounded-md overflow-hidden flex items-center justify-center border border-border/50">
-                          <span className={cn("text-[10px] text-muted-foreground", robotoMono.className)}>
-                            IMG
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-medium h-full py-4">
-                        <span className="text-base">{item.name}</span>
-                        <div className={cn("text-xs text-muted-foreground md:hidden mt-1", robotoMono.className)}>
-                          ${item.price.toLocaleString()}
-                        </div>
-                      </TableCell>
-                      <TableCell className="py-4">
-                        <span className={cn("text-sm", robotoMono.className)}>{item.quantity}</span>
-                      </TableCell>
-                      <TableCell className={cn("text-right py-4 text-sm font-medium", robotoMono.className)}>
-                        ${(item.price * item.quantity).toLocaleString()}
-                      </TableCell>
-                      <TableCell className="py-4 pr-6">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                          <span className="sr-only">Remove</span>
-                        </Button>
+                  {items.length === 0 ? (
+                    <TableRow className="hover:bg-transparent border-border/60">
+                      <TableCell colSpan={5} className="h-24 text-center">
+                        Your cart is empty.
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ) : (
+                    items.map((item) => (
+                      <TableRow key={item.id} className="hover:bg-transparent border-border/60">
+                        <TableCell className="py-4 pl-6">
+                          <div className="relative w-16 h-16 bg-secondary rounded-md overflow-hidden flex items-center justify-center border border-border/50">
+                            <span className={cn("text-[10px] text-muted-foreground", robotoMono.className)}>
+                              IMG
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="font-medium h-full py-4">
+                          <span className="text-base">{item.quantity}x {item.name}</span>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {item.cpus} vCPUs • {item.storage}GB Storage • {item.hours} Hours
+                          </div>
+                          <div className={cn("text-xs text-muted-foreground md:hidden mt-1", robotoMono.className)}>
+                            ${item.totalPrice.toFixed(2)}
+                          </div>
+                        </TableCell>
+                        <TableCell className="py-4">
+                          <span className={cn("text-sm", robotoMono.className)}>{item.quantity}</span>
+                        </TableCell>
+                        <TableCell className={cn("text-right py-4 text-sm font-medium", robotoMono.className)}>
+                          ${item.totalPrice.toFixed(2)}
+                        </TableCell>
+                        <TableCell className="py-4 pr-6">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeItem(item.id)}
+                            className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            <span className="sr-only">Remove</span>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </div>
@@ -143,7 +144,32 @@ export default function CartPage() {
                   </div>
                 </CardContent>
                 <CardFooter className="pt-2 pb-6">
-                  <Button className="w-full h-11 text-base font-medium tracking-wide group rounded-md">
+                  <Button
+                    onClick={async () => {
+                      try {
+                        console.log("Checking out with items:", items);
+                        if (items.length === 0) {
+                          toast("Your cart is empty", "error");
+                          return;
+                        }
+                        const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'}/webhooks/stripe/checkout`, {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ items }),
+                        });
+                        if (!res.ok) {
+                          const errorText = await res.text();
+                          throw new Error(`Checkout failed: ${res.status} ${errorText}`);
+                        }
+                        const { url } = await res.json();
+                        window.location.href = url;
+                      } catch (err: any) {
+                        console.error(err);
+                        toast(`Failed to start checkout: ${err.message}`, "error");
+                      }
+                    }}
+                    className="w-full h-11 text-base font-medium tracking-wide group rounded-md"
+                  >
                     Checkout
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Button>

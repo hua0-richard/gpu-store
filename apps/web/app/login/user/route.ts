@@ -24,11 +24,11 @@ export async function POST(req: Request) {
     try {
       const err = await res.json();
       msg = err?.message ?? msg;
-    } catch {}
+    } catch { }
     return NextResponse.json({ message: msg }, { status: res.status });
   }
 
-  const data: { user: {email: string, name: string | null}, access_token?: string, refresh_token?: string } = await res.json();
+  const data: { user: { email: string, name: string | null }, access_token?: string, refresh_token?: string } = await res.json();
   const accessToken = data.access_token;
   const refreshToken = data.refresh_token;
 
@@ -62,5 +62,5 @@ export async function POST(req: Request) {
     maxAge: 24 * 60 * 60 * 1000,
   });
 
-  return NextResponse.json({ user: data.user});
+  return NextResponse.json({ user: data.user });
 }

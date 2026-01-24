@@ -1,0 +1,10 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Layer 1: Cyan Tensor Plane (Clockwise) -->
+  <rect x="7" y="7" width="18" height="18" rx="4" transform="rotate(22.5 16 16)" stroke="#06b6d4" stroke-opacity="0.6" stroke-width="2" />
+  
+  <!-- Layer 2: Fuchsia Tensor Plane (Counter-Clockwise) -->
+  <rect x="7" y="7" width="18" height="18" rx="4" transform="rotate(-22.5 16 16)" stroke="#d946ef" stroke-opacity="0.6" stroke-width="2" />
+  
+  <!-- Core: Stability Point -->
+  <circle cx="16" cy="16" r="4" fill="white" fill-opacity="0.9" />
+</svg>
