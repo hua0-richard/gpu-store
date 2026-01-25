@@ -37,34 +37,34 @@ Stripe CLI is required for local webhook testing: https://stripe.com/docs/stripe
 ```mermaid
 %%{init: {'theme': 'base', 'themeVariables': { 'fontFamily': 'IBM Plex Sans, system-ui, sans-serif', 'background': '#0b1020', 'mainBkg': '#0b1020', 'primaryTextColor': '#ffffff', 'textColor': '#ffffff', 'labelBackground': '#00000000', 'edgeLabelBackground': '#00000000', 'edgeLabelBorderColor': '#00000000', 'edgeLabelBorder': '#00000000', 'lineColor': '#94a3b8', 'clusterBkg': '#0b1020', 'clusterBorder': '#334155', 'clusterLabelColor': '#ffffff'}}}%%
 flowchart LR
-    User([Customer Browser])
+    User(["Customer Browser<br/>(Client)"])
 
     subgraph Frontend["Frontend (Web)"]
         direction TB
-        Web[Next.js Storefront]
+        Web["Next.js Storefront<br/>(Server-Side Rendering)"]
     end
 
     subgraph Backend["Backend (Services)"]
         direction TB
-        API[NestJS API Gateway]
-        Worker[Job Worker]
+        API["NestJS API<br/>(Business Logic)"]
+        Worker["Job Worker<br/>(Async Processor)"]
     end
 
     subgraph Data["Data (State)"]
         direction TB
-        DB[(PostgreSQL DB)]
-        Redis[(Redis Queue/Cache)]
+        DB[("PostgreSQL<br/>(Primary Database)")]
+        Redis[("Redis<br/>(Queue & Cache)")]
     end
 
     subgraph External["External (Payments)"]
         direction TB
-        Stripe[Stripe Payments]
+        Stripe["Stripe<br/>(Payment Processor)"]
     end
 
-    User -->|HTTPS| Web -->|REST| API
-    API -->|ORM| DB
-    API -->|Jobs| Redis --> Worker -->|Update| DB
-    API <-->|Webhooks| Stripe
+    User -->|HTTPS / User Actions| Web -->|REST API / JSON| API
+    API -->|Prisma ORM| DB
+    API -->|Enqueue Jobs| Redis --> Worker -->|State Update| DB
+    API <-->|Webhooks - Events| Stripe
 
     classDef neutral fill:#111827,stroke:#334155,color:#ffffff;
     classDef next fill:#1e293b,stroke:#94a3b8,color:#ffffff;
