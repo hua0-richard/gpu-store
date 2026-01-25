@@ -69,13 +69,13 @@ flowchart LR
     subgraph Backend["Backend (Services)"]
         direction TB
         API["NestJS API<br/>(Business Logic)"]
-        Worker["Job Worker<br/>(Async Processor)"]
+        Auth["Auth Module<br/>(JWT + Refresh Sessions)"]
     end
 
     subgraph Data["Data (State)"]
         direction TB
         DB[("PostgreSQL<br/>(Primary Database)")]
-        Redis[("Redis<br/>(Queue & Cache)")]
+        Redis[("Redis<br/>(Stripe Locks)")]
     end
 
     subgraph External["External (Payments)"]
@@ -85,18 +85,24 @@ flowchart LR
 
     %% Edge label nodes (text only)
     L_User_Web["HTTPS / User Actions"]
-    L_Web_API["REST API / JSON"]
+    L_Web_API["REST API / JSON + Auth Cookies"]
     L_API_DB["Prisma ORM"]
-    L_API_Redis["Enqueue Jobs"]
-    L_Worker_DB["State Update"]
+    L_API_Redis["Event Idempotency Lock"]
+    L_API_Auth["Auth Endpoints / JWT"]
+    L_Auth_DB["Users + Refresh Sessions"]
     L_API_Stripe["Webhooks / Events"]
+    L_Web_Stripe["Checkout Redirect"]
+    L_API_Checkout["Create Checkout Session"]
 
     %% Connections (label nodes inline)
     User --> L_User_Web --> Web
     Web --> L_Web_API --> API
+    Web --> L_API_Checkout --> API
+    API --> L_API_Auth --> Auth --> L_Auth_DB --> DB
     API --> L_API_DB --> DB
-    API --> L_API_Redis --> Redis --> Worker --> L_Worker_DB --> DB
+    API --> L_API_Redis --> Redis
     API <--> L_API_Stripe <--> Stripe
+    Web --> L_Web_Stripe --> Stripe
 
     %% Node styles
     classDef neutral fill:#111827,stroke:#334155,color:#ffffff;
@@ -112,12 +118,12 @@ flowchart LR
     %% Apply styles
     class User neutral;
     class Web next;
-    class API,Worker nest;
+    class API,Auth nest;
     class DB postgres;
     class Redis redis;
     class Stripe stripe;
 
-    class L_User_Web,L_Web_API,L_API_DB,L_API_Redis,L_Worker_DB,L_API_Stripe edgeText;
+    class L_User_Web,L_Web_API,L_API_DB,L_API_Redis,L_API_Auth,L_Auth_DB,L_API_Stripe,L_Web_Stripe,L_API_Checkout edgeText;
 
     %% Subgraph styles
     style Frontend fill:#0f172a,stroke:#334155,color:#ffffff,stroke-width:1px,rx:10,ry:10
