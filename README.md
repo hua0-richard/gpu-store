@@ -35,8 +35,30 @@ Stripe CLI is required for local webhook testing: https://stripe.com/docs/stripe
 
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'fontFamily': 'IBM Plex Sans, system-ui, sans-serif', 'background': '#0b1020', 'mainBkg': '#0b1020', 'primaryTextColor': '#ffffff', 'textColor': '#ffffff', 'labelBackground': '#00000000', 'edgeLabelBackground': '#00000000', 'edgeLabelBorderColor': '#00000000', 'edgeLabelBorder': '#00000000', 'lineColor': '#94a3b8', 'clusterBkg': '#0b1020', 'clusterBorder': '#334155', 'clusterLabelColor': '#ffffff'}}}%%
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "background": "#0b1020",
+    "mainBkg": "#0b1020",
+    "primaryTextColor": "#ffffff",
+    "textColor": "#ffffff",
+
+    "labelBackground": "rgba(0,0,0,0)",
+
+    "edgeLabelBackground": "rgba(0,0,0,0)",
+    "edgeLabelBorder": "rgba(0,0,0,0)",
+    "edgeLabelBorderWidth": "0",
+    "edgeLabelColor": "#ffffff",
+
+    "lineColor": "#94a3b8",
+    "clusterBkg": "#0b1020",
+    "clusterBorder": "#334155",
+    "clusterLabelColor": "#ffffff"
+  }
+} }%%
+
 flowchart LR
+    %% Nodes
     User(["Customer Browser<br/>(Client)"])
 
     subgraph Frontend["Frontend (Web)"]
@@ -61,11 +83,22 @@ flowchart LR
         Stripe["Stripe<br/>(Payment Processor)"]
     end
 
-    User -->|HTTPS / User Actions| Web -->|REST API / JSON| API
-    API -->|Prisma ORM| DB
-    API -->|Enqueue Jobs| Redis --> Worker -->|State Update| DB
-    API <-->|Webhooks - Events| Stripe
+    %% Edge label nodes (text only)
+    L_User_Web["HTTPS / User Actions"]
+    L_Web_API["REST API / JSON"]
+    L_API_DB["Prisma ORM"]
+    L_API_Redis["Enqueue Jobs"]
+    L_Worker_DB["State Update"]
+    L_API_Stripe["Webhooks / Events"]
 
+    %% Connections (label nodes inline)
+    User --> L_User_Web --> Web
+    Web --> L_Web_API --> API
+    API --> L_API_DB --> DB
+    API --> L_API_Redis --> Redis --> Worker --> L_Worker_DB --> DB
+    API <--> L_API_Stripe <--> Stripe
+
+    %% Node styles
     classDef neutral fill:#111827,stroke:#334155,color:#ffffff;
     classDef next fill:#1e293b,stroke:#94a3b8,color:#ffffff;
     classDef nest fill:#3f1d2a,stroke:#fb7185,color:#ffffff;
@@ -73,6 +106,10 @@ flowchart LR
     classDef redis fill:#3b1f1f,stroke:#f87171,color:#ffffff;
     classDef stripe fill:#2b1b4b,stroke:#a78bfa,color:#ffffff;
 
+    %% Text-only label style (GitHub-safe)
+    classDef edgeText fill:transparent,stroke:transparent,color:#cbd5f5;
+
+    %% Apply styles
     class User neutral;
     class Web next;
     class API,Worker nest;
@@ -80,11 +117,15 @@ flowchart LR
     class Redis redis;
     class Stripe stripe;
 
+    class L_User_Web,L_Web_API,L_API_DB,L_API_Redis,L_Worker_DB,L_API_Stripe edgeText;
+
+    %% Subgraph styles
     style Frontend fill:#0f172a,stroke:#334155,color:#ffffff,stroke-width:1px,rx:10,ry:10
     style Backend fill:#0f172a,stroke:#334155,color:#ffffff,stroke-width:1px,rx:10,ry:10
     style Data fill:#0f172a,stroke:#334155,color:#ffffff,stroke-width:1px,rx:10,ry:10
     style External fill:#0f172a,stroke:#334155,color:#ffffff,stroke-width:1px,rx:10,ry:10
 
+    %% Edge style
     linkStyle default stroke:#94a3b8,stroke-width:1.5px
 ```
 
