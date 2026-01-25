@@ -29,6 +29,65 @@ Stripe CLI is required for local webhook testing: https://stripe.com/docs/stripe
 
 ---
 
+## Architecture Diagram
+
+
+
+
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'fontFamily': 'IBM Plex Sans, system-ui, sans-serif', 'background': '#0b1020', 'mainBkg': '#0b1020', 'primaryTextColor': '#ffffff', 'textColor': '#ffffff', 'labelBackground': '#00000000', 'edgeLabelBackground': '#00000000', 'edgeLabelBorderColor': '#00000000', 'edgeLabelBorder': '#00000000', 'lineColor': '#94a3b8', 'clusterBkg': '#0b1020', 'clusterBorder': '#334155', 'clusterLabelColor': '#ffffff'}}}%%
+flowchart LR
+    User([Customer Browser])
+
+    subgraph Frontend["Frontend (Web)"]
+        direction TB
+        Web[Next.js Storefront]
+    end
+
+    subgraph Backend["Backend (Services)"]
+        direction TB
+        API[NestJS API Gateway]
+        Worker[Job Worker]
+    end
+
+    subgraph Data["Data (State)"]
+        direction TB
+        DB[(PostgreSQL DB)]
+        Redis[(Redis Queue/Cache)]
+    end
+
+    subgraph External["External (Payments)"]
+        direction TB
+        Stripe[Stripe Payments]
+    end
+
+    User -->|HTTPS| Web -->|REST| API
+    API -->|ORM| DB
+    API -->|Jobs| Redis --> Worker -->|Update| DB
+    API <-->|Webhooks| Stripe
+
+    classDef neutral fill:#111827,stroke:#334155,color:#ffffff;
+    classDef next fill:#1e293b,stroke:#94a3b8,color:#ffffff;
+    classDef nest fill:#3f1d2a,stroke:#fb7185,color:#ffffff;
+    classDef postgres fill:#0f2a3d,stroke:#38bdf8,color:#ffffff;
+    classDef redis fill:#3b1f1f,stroke:#f87171,color:#ffffff;
+    classDef stripe fill:#2b1b4b,stroke:#a78bfa,color:#ffffff;
+
+    class User neutral;
+    class Web next;
+    class API,Worker nest;
+    class DB postgres;
+    class Redis redis;
+    class Stripe stripe;
+
+    style Frontend fill:#0f172a,stroke:#334155,color:#ffffff,stroke-width:1px,rx:10,ry:10
+    style Backend fill:#0f172a,stroke:#334155,color:#ffffff,stroke-width:1px,rx:10,ry:10
+    style Data fill:#0f172a,stroke:#334155,color:#ffffff,stroke-width:1px,rx:10,ry:10
+    style External fill:#0f172a,stroke:#334155,color:#ffffff,stroke-width:1px,rx:10,ry:10
+
+    linkStyle default stroke:#94a3b8,stroke-width:1.5px
+```
+
 ## 🧰 Tech Stack
 
 ### Frontend
