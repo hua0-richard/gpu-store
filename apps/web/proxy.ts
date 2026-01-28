@@ -5,7 +5,7 @@ export async function proxy(request: NextRequest) {
   const hasSession = request.cookies.has("session");
   const hasRefresh = request.cookies.has("refresh");
 
-  const isProtectedRoute = request.nextUrl.pathname.startsWith("/amd");
+  const isProtectedRoute = request.nextUrl.pathname.startsWith("/cart");
 
   if (isProtectedRoute && !hasSession && hasRefresh) {
     console.log("here")
