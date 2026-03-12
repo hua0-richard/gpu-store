@@ -1,0 +1,31 @@
+FROM node:20-alpine AS builder
+WORKDIR /app
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# Copy workspace files
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/api/package.json ./apps/api/
+COPY apps/api/prisma ./apps/api/prisma/
+
+# Install all deps (needed for build)
+RUN pnpm install --frozen-lockfile
+
+# Copy source and build
+COPY apps/api ./apps/api/
+RUN pnpm --filter api build
+
+# ---- Runtime ----
+FROM node:20-alpine
+WORKDIR /app
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/api/package.json ./apps/api/
+COPY apps/api/prisma ./apps/api/prisma/
+
+RUN pnpm install --frozen-lockfile --prod
+
+COPY --from=builder /app/apps/api/dist ./apps/api/dist
+
+EXPOSE 3001
+CMD ["node", "apps/api/dist/main"]

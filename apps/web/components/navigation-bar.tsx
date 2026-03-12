@@ -88,7 +88,7 @@ export default function NavigationBar() {
         )}
 
         <Button variant="ghost" size="icon" asChild className="relative">
-          <Link href="/cart" aria-label="Cart">
+          <Link href="/cart" aria-label="Cart" prefetch={false}>
             <ShoppingBag className="h-5 w-5" />
             {cartCount > 0 && (
               <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
