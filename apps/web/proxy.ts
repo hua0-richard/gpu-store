@@ -7,24 +7,10 @@ export async function proxy(request: NextRequest) {
 
   const isProtectedRoute = request.nextUrl.pathname.startsWith("/cart");
 
-  if (isProtectedRoute && !hasSession && hasRefresh) {
-    console.log("here")
-    const refreshRes = await fetch(new URL("/refresh/user", request.url), {
-      method: "POST",
-      headers: {
-        cookie: request.headers.get("cookie") ?? "",
-      },
-    });
-
-    if (!refreshRes.ok) {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
-
-    const response = NextResponse.next();
-    const setCookie = refreshRes.headers.get("set-cookie");
-    if (setCookie) response.headers.set("set-cookie", setCookie);
-    return response;
-  } else if (isProtectedRoute && !hasSession && !hasRefresh) {
+  // Only hard-redirect when the user has no auth cookies at all.
+  // If a refresh cookie exists, let the request through — the client-side
+  // auth context will validate and refresh the session as needed.
+  if (isProtectedRoute && !hasSession && !hasRefresh) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
