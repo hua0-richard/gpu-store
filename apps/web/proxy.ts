@@ -9,7 +9,7 @@ export async function proxy(request: NextRequest) {
 
   if (isProtectedRoute && !hasSession && hasRefresh) {
     console.log("here")
-    const refreshRes = await fetch(new URL("/api/auth/refresh", request.url), {
+    const refreshRes = await fetch(new URL("/refresh/user", request.url), {
       method: "POST",
       headers: {
         cookie: request.headers.get("cookie") ?? "",
