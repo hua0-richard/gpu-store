@@ -68,6 +68,7 @@ export class StripeController {
 
     const session = await this.stripe.checkout.sessions.create({
       mode: 'payment',
+      payment_method_types: ['card'],
       metadata: {
         userEmail,
       },
