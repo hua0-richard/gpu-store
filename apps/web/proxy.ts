@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const hasSession = request.cookies.has("session");
   const hasRefresh = request.cookies.has("refresh");
 
@@ -30,3 +30,7 @@ export async function proxy(request: NextRequest) {
 
   return NextResponse.next();
 }
+
+export const config = {
+  matcher: ["/cart/:path*"],
+};
