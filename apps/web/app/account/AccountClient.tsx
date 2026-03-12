@@ -82,9 +82,7 @@ export default function AccountClient() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchWithAuth(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api"}/orders`
-      )
+      fetchWithAuth(`/orders`)
         .then((res) => {
           if (!res.ok) throw new Error("Failed to fetch");
           return res.json();
