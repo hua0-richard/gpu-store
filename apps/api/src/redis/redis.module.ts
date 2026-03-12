@@ -9,11 +9,13 @@ import { LockService } from "./lock.service";
     {
       provide: "REDIS",
       useFactory: () => {
+        const tls = process.env.REDIS_TLS === "true";
         return new Redis({
           host: process.env.REDIS_HOST ?? "localhost",
           port: Number(process.env.REDIS_PORT ?? 6379),
           password: process.env.REDIS_PASSWORD || undefined,
           maxRetriesPerRequest: 10,
+          tls: tls ? {} : undefined,
         });
       },
     },
