@@ -38,7 +38,7 @@ export default function DashboardPage() {
 
         if (isAuthenticated) {
             const fetchInstances = () => {
-                fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'}/instances`)
+                fetchWithAuth(`/instances`)
                     .then(res => res.json())
                     .then(data => {
                         if (Array.isArray(data)) {
