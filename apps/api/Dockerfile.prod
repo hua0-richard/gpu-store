@@ -14,6 +14,7 @@ RUN pnpm install --frozen-lockfile
 COPY apps/api ./apps/api/
 RUN pnpm --filter api exec prisma generate
 RUN pnpm --filter api build
+RUN ls -la apps/api/dist/ && echo "Build output verified"
 
 # ---- Runtime ----
 FROM node:20-alpine
@@ -30,4 +31,4 @@ COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY --from=builder /app/apps/api/generated ./apps/api/generated
 
 EXPOSE 3001
-CMD ["node", "apps/api/dist/main"]
+CMD ["node", "apps/api/dist/src/main"]
