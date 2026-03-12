@@ -26,10 +26,21 @@ import { cn } from "@/lib/utils";
 import { fetchWithAuth } from "@/lib/api";
 import { useCart } from "@/components/cart-context";
 import { useToast } from "@/components/toast-context";
+import { useAuth } from "@/components/auth-context";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function CartPage() {
   const { items, removeItem } = useCart();
   const { toast } = useToast();
+  const { isAuthenticated, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.replace("/login");
+    }
+  }, [isAuthenticated, loading, router]);
 
   const subtotal = items.reduce(
     (acc, item) => acc + item.totalPrice,
