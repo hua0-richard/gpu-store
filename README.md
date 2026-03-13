@@ -9,7 +9,7 @@ Full-stack compute billing platform with Stripe payments, JWT auth, webhook proc
 
 ---
 
-![Demo screenshot](demo.png)
+![Demo](demo.gif)
 
 ## Demo Access
 
@@ -181,7 +181,7 @@ Starts the full stack and seeds the database with sample data.
 
 ```bash
 docker compose up
-pnpm db:seed:dev
+pnpm --filter api db:seed:dev
 # open http://localhost:3000
 ```
 
@@ -200,6 +200,7 @@ Use this card number to complete a payment in test mode.
 ```
 ╔═══════════════════════════════════════╗
 ║  STRIPE TEST BANK                VISA ║
+║                                       ║
 ║  ▓▓▓ ))                               ║
 ║                                       ║
 ║  4242   4242   4242   4242            ║
