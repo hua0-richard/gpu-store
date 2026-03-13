@@ -11,6 +11,15 @@ Full-stack compute billing platform with Stripe payments, JWT auth, webhook proc
 
 ![Demo screenshot](demo.png)
 
+## Demo Access
+
+> Test account for recruiters — no sign-up required.
+
+| Field    | Value              |
+| -------- | ------------------ |
+| Email    | `demo@gpustore.dev` |
+| Password | `Demo1234!`        |
+
 ---
 
 ## Architecture
