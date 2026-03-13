@@ -10,14 +10,22 @@
     "build": "pnpm -r build",
     "docker:up": "docker compose up",
     "stripe:listen": "wait-on tcp:localhost:3001 && stripe login && stripe listen --forward-to=http://localhost:3001/webhooks/stripe",
-    "run:dev": "concurrently -k -n DOCKER,STRIPE -c cyan,magenta npm:docker:up npm:stripe:listen"
+    "run:dev": "concurrently -k -n DOCKER,STRIPE -c cyan,magenta npm:docker:up npm:stripe:listen",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.15.0",
+  "lint-staged": {
+    "apps/api/**/*.ts": "eslint --fix",
+    "apps/web/**/*.{ts,tsx}": "eslint --fix",
+    "**/*.{ts,tsx,js,json,md}": "prettier --write"
+  },
   "devDependencies": {
     "concurrently": "^9.2.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.3.3",
     "prettier": "latest",
     "wait-on": "^9.0.3"
   }
