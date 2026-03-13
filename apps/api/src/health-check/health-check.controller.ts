@@ -7,6 +7,7 @@ interface ShieldsBadge {
   label: string;
   message: string;
   color: string;
+  cacheSeconds: number;
 }
 
 @Controller('health-check')
@@ -38,6 +39,7 @@ export class HealthCheckController {
       label: 'Neon DB',
       message: healthy ? 'healthy' : 'down',
       color: healthy ? 'brightgreen' : 'red',
+      cacheSeconds: 30,
     };
   }
 
@@ -56,6 +58,7 @@ export class HealthCheckController {
       label: 'Azure Cache',
       message: healthy ? 'healthy' : 'down',
       color: healthy ? 'brightgreen' : 'red',
+      cacheSeconds: 30,
     };
   }
 }
