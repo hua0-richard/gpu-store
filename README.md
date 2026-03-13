@@ -7,6 +7,14 @@ Production-grade full-stack application featuring secure authentication, Stripe 
 ## 📌 Overview
 This project demonstrates an end-to-end web application with authentication, payments, and asynchronous processing, built using modern TypeScript-based tooling across the stack.
 
+## Deployment Status
+[![Vercel Status](https://img.shields.io/github/deployments/hua0-richard/gpu-store/Production?label=Vercel&logo=vercel&logoColor=white&style=flat&labelColor=0a0a0a)](https://vercel.com)
+
+[![Neon](https://img.shields.io/badge/Neon-Database-00E599?style=flat&logo=data:image/svg%2Bxml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNjMgMC4wMTc3OTA5VjYzLjU1MjZMMzguNDE3OCA0Mi4yNTAxVjYzLjU1MjZIMFYwTDYzIDAuMDE3NzkwOVpNNy43MjI1MSA1NS44Mzg5SDMwLjY5NTNWMjUuMzIzOEw1NS4yNzc5IDQ3LjA0NzZWNy43MjkyMkw3LjcyMjUxIDcuNzE1NTlWNTUuODM4OVoiIGZpbGw9IndoaXRlIi8+PC9zdmc+&logoColor=white&labelColor=0a0a0a)](https://neon.tech)
+
+[![Azure](https://img.shields.io/badge/Azure-API-0078D4?style=flat&logo=data:image/svg%2Bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1OS42NSA1NiI+PHBhdGggZD0iTTMzLjU4IDAgMTguMzYgMTMuNjMgMCA0My42OWgxNS44M3ptMi4yNyAzLjY4TDI4LjEgMjMuNTZsMTQuMzkgMTguMDctMjcuOTMgNC42OGg0NC41eiIgZmlsbD0id2hpdGUiLz48L3N2Zz4K&logoColor=white&labelColor=0a0a0a)](https://azure.microsoft.com)
+
+[![Redis](https://img.shields.io/badge/Azure_Cache-Redis-DC382D?style=flat&logo=redis&logoColor=white&labelColor=0a0a0a)](https://azure.microsoft.com/products/cache)
 ---
 
 ## Demo
