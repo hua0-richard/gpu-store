@@ -10,8 +10,8 @@ export class StripeService {
   constructor(
     private lockService: LockService,
     private paymentsService: PaymentsService,
-    private instancesService: InstancesService
-  ) { }
+    private instancesService: InstancesService,
+  ) {}
 
   async handleStripeEvent(stripeEvent: Stripe.Event) {
     if (!stripeEvent.id) {
@@ -30,10 +30,11 @@ export class StripeService {
       switch (stripeEvent.type) {
         case 'checkout.session.completed': {
           console.log('Handling checkout.session.completed');
-          const session = stripeEvent.data.object as Stripe.Checkout.Session;
-          const userEmail = session.payment_intent && typeof session.payment_intent === 'object'
-            ? (session.payment_intent as any).metadata?.userEmail
-            : session.metadata?.userEmail;
+          const session = stripeEvent.data.object;
+          const userEmail =
+            session.payment_intent && typeof session.payment_intent === 'object'
+              ? (session.payment_intent as any).metadata?.userEmail
+              : session.metadata?.userEmail;
 
           console.log(`Found user email: ${userEmail}`);
 
@@ -45,7 +46,7 @@ export class StripeService {
           // Fetch line items to get details
           console.log('Fetching line items...');
           const lineItems = await new Stripe(process.env.STRIPE_SECRET_KEY!, {
-            apiVersion: '2025-12-15.clover' // Matches installed library version
+            apiVersion: '2025-12-15.clover', // Matches installed library version
           }).checkout.sessions.listLineItems(session.id, {
             expand: ['data.price.product'],
           });
@@ -75,7 +76,7 @@ export class StripeService {
                 }),
               },
             },
-            include: { items: true } // Include items so we can pass them to instances service
+            include: { items: true }, // Include items so we can pass them to instances service
           });
           console.log('Order created successfully:', order.id);
 
@@ -86,7 +87,7 @@ export class StripeService {
         }
         case 'payment_intent.succeeded': {
           console.log('Handling payment_intent.succeeded');
-          const paymentIntent = stripeEvent.data.object as Stripe.PaymentIntent;
+          const paymentIntent = stripeEvent.data.object;
           const email = paymentIntent.metadata.userEmail;
           console.log('Payment succeeded for:', email);
           if (email) {

@@ -4,11 +4,11 @@ import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('instances')
 export class InstancesController {
-    constructor(private readonly instancesService: InstancesService) { }
+  constructor(private readonly instancesService: InstancesService) {}
 
-    @UseGuards(AuthGuard)
-    @Get()
-    async getMyInstances(@Req() req: any) {
-        return this.instancesService.findAll(req.user.email);
-    }
+  @UseGuards(AuthGuard)
+  @Get()
+  getMyInstances(@Req() req: any) {
+    return this.instancesService.findAll(req.user.email);
+  }
 }

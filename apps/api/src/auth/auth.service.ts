@@ -1,10 +1,9 @@
-import { Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { RefreshSessionsService } from 'src/refresh-sessions/refresh-sessions.service';
 import { JwtService } from '@nestjs/jwt';
 import { randomBytes, randomUUID } from 'crypto';
 import bcrypt from 'bcrypt';
-const nodemailer = require('nodemailer');
 
 @Injectable()
 export class AuthService {
@@ -24,7 +23,7 @@ export class AuthService {
 
   async createRefreshTokenEntry(email: string): Promise<string> {
     const sessionId = randomUUID();
-    const refreshToken = await this.generateRefreshToken();
+    const refreshToken = this.generateRefreshToken();
     const refreshTokenHash = await this.generateRefreshHash(refreshToken);
 
     await this.refreshSessionsService.createOne(sessionId, email, refreshTokenHash);
@@ -80,7 +79,7 @@ export class AuthService {
     // })();
 
     const user = await this.usersService.createOne(name, email, pass);
-    
+
     if (!user) {
       throw new UnauthorizedException();
     }
@@ -96,31 +95,31 @@ export class AuthService {
     };
   }
 
-  async refreshAccessToken(refreshToken: string): Promise<{access_token: string}> {
-    const [sessionId, token] = refreshToken.split(".");
+  async refreshAccessToken(refreshToken: string): Promise<{ access_token: string }> {
+    const [sessionId, token] = refreshToken.split('.');
     if (!sessionId || !token) {
       throw new UnauthorizedException('Invalid refresh token');
     }
-    const refreshTokenResult = await this.refreshSessionsService.findOneToken(sessionId, token)
+    const refreshTokenResult = await this.refreshSessionsService.findOneToken(sessionId, token);
     if (!refreshTokenResult) {
-      throw new UnauthorizedException('Invalid refresh token')
+      throw new UnauthorizedException('Invalid refresh token');
     }
     const payload = { email: refreshTokenResult.email };
     const accessToken = await this.jwtService.signAsync(payload);
     return {
-        access_token: accessToken
-    }
+      access_token: accessToken,
+    };
   }
 
   async revokeRefreshToken(refreshToken: string): Promise<void> {
-      const [sessionId, token] = refreshToken.split(".");
-      if (!sessionId || !token) {
-        return;
-      }
-      const refreshTokenResult = await this.refreshSessionsService.findOneToken(sessionId, token);
-      if (!refreshTokenResult) {
-        return;
-      }
-      await this.refreshSessionsService.revokeOneToken(sessionId);
+    const [sessionId, token] = refreshToken.split('.');
+    if (!sessionId || !token) {
+      return;
+    }
+    const refreshTokenResult = await this.refreshSessionsService.findOneToken(sessionId, token);
+    if (!refreshTokenResult) {
+      return;
+    }
+    await this.refreshSessionsService.revokeOneToken(sessionId);
   }
 }

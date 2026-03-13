@@ -6,19 +6,15 @@ import Stripe from 'stripe';
 
 @Controller('webhooks/stripe')
 export class StripeController {
-  constructor(private stripeService: StripeService) { }
+  constructor(private stripeService: StripeService) {}
   private stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     // set api version
   });
 
   @Post()
   @HttpCode(200)
-  async handleStripeWebhook(
-    @Req() req: Request & { rawBody?: Buffer },
-    @Res() res: Response,
-    @Headers('stripe-signature') signature?: string,
-  ) {
-    console.log("HOOK")
+  handleStripeWebhook(@Req() req: Request & { rawBody?: Buffer }, @Res() res: Response, @Headers('stripe-signature') signature?: string) {
+    console.log('HOOK');
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
     if (!signature) return res.status(400).send('Missing stripe-signature');
     if (!req.rawBody) return res.status(400).send('Missing raw body');

@@ -7,4 +7,4 @@ import { InstancesController } from './instances.controller';
   providers: [InstancesService],
   exports: [InstancesService],
 })
-export class InstancesModule { }
+export class InstancesModule {}

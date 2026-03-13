@@ -21,9 +21,9 @@ import { InstancesModule } from './instances/instances.module';
     StripeModule,
     PaymentsModule,
     OrdersModule,
-    InstancesModule
+    InstancesModule,
   ],
   controllers: [AppController, HealthCheckController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}
