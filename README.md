@@ -16,7 +16,9 @@ This project demonstrates an end-to-end web application with authentication, pay
 
 [![Azure Deploy](https://custom-icon-badges.demolab.com/github/actions/workflow/status/hua0-richard/gpu-store/ci-cd.yml?style=flat&label=Azure+Deploy&logo=msazure&logoColor=white&labelColor=0a0a0a&color=0078D4)](https://github.com/hua0-richard/gpu-store/actions/workflows/ci-cd.yml)
 
-## [![Redis](https://img.shields.io/badge/Azure_Cache-Redis-DC382D?style=flat&logo=redis&logoColor=white&labelColor=0a0a0a)](https://azure.microsoft.com/products/cache)
+[![Redis](https://img.shields.io/badge/Azure_Cache-Redis-DC382D?style=flat&logo=redis&logoColor=white&labelColor=0a0a0a)](https://azure.microsoft.com/products/cache)
+
+---
 
 ## Demo
 
