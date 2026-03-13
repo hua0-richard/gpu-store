@@ -68,12 +68,12 @@ flowchart LR
     %% Nodes
     User(["Customer Browser<br/>(Client)"])
 
-    subgraph Frontend["Frontend (Web)"]
+    subgraph Frontend["▲ Vercel — Frontend"]
         direction TB
-        Web["Next.js Storefront<br/>(Server-Side Rendering)"]
+        Web["Next.js Storefront<br/>(SSR / Edge Network)"]
     end
 
-    subgraph Backend["Backend (Services)"]
+    subgraph Backend["☁ Azure Container Apps — Backend"]
         direction TB
         API["NestJS API<br/>(Business Logic)"]
         Auth["Auth Module<br/>(JWT + Refresh Sessions)"]
@@ -81,8 +81,8 @@ flowchart LR
 
     subgraph Data["Data (State)"]
         direction TB
-        DB[("PostgreSQL<br/>(Primary Database)")]
-        Redis[("Redis<br/>(Stripe Locks)")]
+        DB[("Neon<br/>(PostgreSQL)")]
+        Redis[("Azure Cache<br/>(Redis)")]
     end
 
     subgraph External["External (Payments)"]
@@ -113,10 +113,10 @@ flowchart LR
 
     %% Node styles
     classDef neutral fill:#111827,stroke:#334155,color:#ffffff;
-    classDef next fill:#1e293b,stroke:#94a3b8,color:#ffffff;
+    classDef next fill:#111111,stroke:#ffffff,color:#ffffff;
     classDef nest fill:#3f1d2a,stroke:#fb7185,color:#ffffff;
-    classDef postgres fill:#0f2a3d,stroke:#38bdf8,color:#ffffff;
-    classDef redis fill:#3b1f1f,stroke:#f87171,color:#ffffff;
+    classDef neon fill:#002b1f,stroke:#00e599,color:#ffffff;
+    classDef azurecache fill:#0c2340,stroke:#50abf1,color:#ffffff;
     classDef stripe fill:#2b1b4b,stroke:#a78bfa,color:#ffffff;
 
     %% Text-only label style (GitHub-safe)
@@ -126,17 +126,17 @@ flowchart LR
     class User neutral;
     class Web next;
     class API,Auth nest;
-    class DB postgres;
-    class Redis redis;
+    class DB neon;
+    class Redis azurecache;
     class Stripe stripe;
 
     class L_User_Web,L_Web_API,L_API_DB,L_API_Redis,L_API_Auth,L_Auth_DB,L_API_Stripe,L_Web_Stripe,L_API_Checkout edgeText;
 
     %% Subgraph styles
-    style Frontend fill:#0f172a,stroke:#334155,color:#ffffff,stroke-width:1px,rx:10,ry:10
-    style Backend fill:#0f172a,stroke:#334155,color:#ffffff,stroke-width:1px,rx:10,ry:10
-    style Data fill:#0f172a,stroke:#334155,color:#ffffff,stroke-width:1px,rx:10,ry:10
-    style External fill:#0f172a,stroke:#334155,color:#ffffff,stroke-width:1px,rx:10,ry:10
+    style Frontend fill:#0a0a0a,stroke:#ffffff,color:#ffffff,stroke-width:1px
+    style Backend fill:#001529,stroke:#0078d4,color:#ffffff,stroke-width:1px
+    style Data fill:#0f172a,stroke:#334155,color:#ffffff,stroke-width:1px
+    style External fill:#0f172a,stroke:#334155,color:#ffffff,stroke-width:1px
 
     %% Edge style
     linkStyle default stroke:#94a3b8,stroke-width:1.5px
