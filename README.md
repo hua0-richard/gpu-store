@@ -5,19 +5,21 @@ Production-grade full-stack application featuring secure authentication, Stripe 
 ---
 
 ## 📌 Overview
+
 This project demonstrates an end-to-end web application with authentication, payments, and asynchronous processing, built using modern TypeScript-based tooling across the stack.
 
 ## Deployment Status
+
 [![Vercel Status](https://img.shields.io/github/deployments/hua0-richard/gpu-store/Production?label=Vercel&logo=vercel&logoColor=white&style=flat&labelColor=0a0a0a)](https://vercel.com)
 
 [![Neon](https://img.shields.io/badge/Neon-Database-00E599?style=flat&logo=data:image/svg%2Bxml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNjMgMC4wMTc3OTA5VjYzLjU1MjZMMzguNDE3OCA0Mi4yNTAxVjYzLjU1MjZIMFYwTDYzIDAuMDE3NzkwOVpNNy43MjI1MSA1NS44Mzg5SDMwLjY5NTNWMjUuMzIzOEw1NS4yNzc5IDQ3LjA0NzZWNy43MjkyMkw3LjcyMjUxIDcuNzE1NTlWNTUuODM4OVoiIGZpbGw9IndoaXRlIi8+PC9zdmc+&logoColor=white&labelColor=0a0a0a)](https://neon.tech)
 
-[![Azure Deploy](https://img.shields.io/github/actions/workflow/status/hua0-richard/gpu-store/ci-cd.yml?style=flat&label=Azure+Deploy&logo=microsoftazure&logoColor=white&labelColor=0a0a0a&color=0078D4)](https://github.com/hua0-richard/gpu-store/actions/workflows/ci-cd.yml)
+[![Azure Deploy](https://custom-icon-badges.demolab.com/github/actions/workflow/status/hua0-richard/gpu-store/ci-cd.yml?style=flat&label=Azure+Deploy&logo=msazure&logoColor=white&labelColor=0a0a0a&color=0078D4)](https://github.com/hua0-richard/gpu-store/actions/workflows/ci-cd.yml)
 
-[![Redis](https://img.shields.io/badge/Azure_Cache-Redis-DC382D?style=flat&logo=redis&logoColor=white&labelColor=0a0a0a)](https://azure.microsoft.com/products/cache)
----
+## [![Redis](https://img.shields.io/badge/Azure_Cache-Redis-DC382D?style=flat&logo=redis&logoColor=white&labelColor=0a0a0a)](https://azure.microsoft.com/products/cache)
 
 ## Demo
+
 ![Demo screenshot](demo.png)
 
 ## Quick Start Local
@@ -29,6 +31,7 @@ Stripe CLI is required for local webhook testing: https://stripe.com/docs/stripe
 3. `http://localhost:3000/`
 
 ## 🏗 Architecture
+
 - **Authentication**: JWT access tokens with refresh tokens with multiple sessions
 - **Security**: Password and Refresh token hashing using `bcrypt`
 - **Payments**: Stripe Checkout with webhook-driven state updates
@@ -38,9 +41,6 @@ Stripe CLI is required for local webhook testing: https://stripe.com/docs/stripe
 ---
 
 ## Architecture Diagram
-
-
-
 
 ```mermaid
 %%{init: {
@@ -146,11 +146,13 @@ flowchart LR
 ## 🧰 Tech Stack
 
 ### Frontend
+
 - **Next.js**
 - **shadcn/ui**
 - **TypeScript**
 
 ### Backend
+
 - **NestJS**
 - **Prisma**
 - **PostgreSQL**
@@ -160,6 +162,7 @@ flowchart LR
 ---
 
 ## ✨ Core Features
+
 - User authentication (login, refresh, logout)
 - Shopping cart
 - Secure Stripe payments
@@ -169,9 +172,10 @@ flowchart LR
 ---
 
 ## 🔄 Key Engineering Highlights
+
 - Designed **token-based auth** with refresh tokens
-<!-- - Implemented **Stripe webhooks** with signature verification and idempotency -->
-<!-- - Built **Redis-backed job processing** for non-blocking workflows -->
+  <!-- - Implemented **Stripe webhooks** with signature verification and idempotency -->
+  <!-- - Built **Redis-backed job processing** for non-blocking workflows -->
 - Enforced **clear service boundaries** in a NestJS architecture
 - Used **Prisma migrations** for safe schema evolution
 
@@ -180,6 +184,7 @@ flowchart LR
 ### Database
 
 Seed the database:
+
 ```bash
 pnpm db:seed:dev
 ```
@@ -191,19 +196,25 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ecommerce pnpm prisma
 ```bash
 pnpm db:dev:reset
 ```
+
 Enable Stripe webhooks locally using the Stripe CLI:
+
 ```
 stripe listen --forward-to localhost:3001/webhooks/stripe
 ```
+
 Could be required
+
 ```
 stripe login
 ```
 
 ## CI / CD
+
 Frontend is deployed on vercel
 
 ### Notes
+
 Useful Test Billing Info
 
 Card number: 4242 4242 4242 4242
