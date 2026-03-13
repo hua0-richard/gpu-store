@@ -152,6 +152,7 @@ stripe listen --forward-to localhost:3001/webhooks/stripe
 ╔═══════════════════════════════════════╗
 ║  STRIPE TEST BANK                VISA ║
 ║  ▓▓▓ ))                               ║
+║                                       ║
 ║  4242   4242   4242   4242            ║
 ║  TEST CARDHOLDER   VALID  CVC  ZIP    ║
 ║                    12/34  123  12345  ║
