@@ -13,7 +13,7 @@ Full-stack compute billing platform with Stripe payments, JWT auth, webhook proc
 
 ## Demo Access
 
-> Test account for recruiters — no sign-up required.
+> Test account
 
 | Field    | Value              |
 | -------- | ------------------ |
