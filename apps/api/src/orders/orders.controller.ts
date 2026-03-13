@@ -4,12 +4,12 @@ import { OrdersService } from './orders.service';
 
 @Controller('orders')
 export class OrdersController {
-    constructor(private ordersService: OrdersService) { }
+  constructor(private ordersService: OrdersService) {}
 
-    @UseGuards(AuthGuard)
-    @Get()
-    async getUserOrders(@Req() req: Record<string, any>) {
-        const email = req.user.email;
-        return this.ordersService.getUserOrders(email);
-    }
+  @UseGuards(AuthGuard)
+  @Get()
+  getUserOrders(@Req() req: Record<string, any>) {
+    const email = req.user.email;
+    return this.ordersService.getUserOrders(email);
+  }
 }

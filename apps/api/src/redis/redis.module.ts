@@ -1,17 +1,17 @@
-import { Global, Module } from "@nestjs/common";
-import Redis from "ioredis";
-import { RedisService } from "./redis.service";
-import { LockService } from "./lock.service";
+import { Global, Module } from '@nestjs/common';
+import Redis from 'ioredis';
+import { RedisService } from './redis.service';
+import { LockService } from './lock.service';
 
 @Global()
 @Module({
   providers: [
     {
-      provide: "REDIS",
+      provide: 'REDIS',
       useFactory: () => {
-        const tls = process.env.REDIS_TLS === "true";
+        const tls = process.env.REDIS_TLS === 'true';
         return new Redis({
-          host: process.env.REDIS_HOST ?? "localhost",
+          host: process.env.REDIS_HOST ?? 'localhost',
           port: Number(process.env.REDIS_PORT ?? 6379),
           password: process.env.REDIS_PASSWORD || undefined,
           maxRetriesPerRequest: 10,
@@ -19,7 +19,9 @@ import { LockService } from "./lock.service";
         });
       },
     },
-    RedisService, LockService],
-  exports: ["REDIS", RedisService, LockService],
+    RedisService,
+    LockService,
+  ],
+  exports: ['REDIS', RedisService, LockService],
 })
-export class RedisModule { }
+export class RedisModule {}

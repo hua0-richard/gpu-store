@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { prisma } from '../../lib/prisma';
-import { RefreshSession } from 'generated/prisma/client';
 import bcrypt from 'bcrypt';
 
 @Injectable()
@@ -58,7 +57,7 @@ export class RefreshSessionsService {
 
   async revokeOneToken(sessionId: string): Promise<boolean> {
     try {
-      const revokeUserToken = await prisma.refreshSession.update({
+      await prisma.refreshSession.update({
         where: { sessionId: sessionId },
         data: {
           sessionId: sessionId,

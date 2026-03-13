@@ -9,6 +9,6 @@ import { InstancesModule } from '../instances/instances.module';
 @Module({
   imports: [RedisModule, PaymentsModule, InstancesModule],
   controllers: [StripeController],
-  providers: [StripeService]
+  providers: [StripeService],
 })
-export class StripeModule { }
+export class StripeModule {}
