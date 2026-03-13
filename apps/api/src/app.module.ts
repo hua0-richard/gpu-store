@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { HealthCheckController } from './health-check/health-check.controller';
+import { HealthCheckModule } from './health-check/health-check.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { RefreshSessionsModule } from './refresh-sessions/refresh-sessions.module';
@@ -15,6 +15,7 @@ import { InstancesModule } from './instances/instances.module';
 @Module({
   imports: [
     ScheduleModule.forRoot(),
+    HealthCheckModule,
     AuthModule,
     UsersModule,
     RefreshSessionsModule,
@@ -23,7 +24,7 @@ import { InstancesModule } from './instances/instances.module';
     OrdersModule,
     InstancesModule,
   ],
-  controllers: [AppController, HealthCheckController],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
