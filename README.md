@@ -14,7 +14,7 @@ This project demonstrates an end-to-end web application with authentication, pay
 
 [![Neon](https://img.shields.io/badge/Neon-Database-00E599?style=flat&logo=data:image/svg%2Bxml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNjMgMC4wMTc3OTA5VjYzLjU1MjZMMzguNDE3OCA0Mi4yNTAxVjYzLjU1MjZIMFYwTDYzIDAuMDE3NzkwOVpNNy43MjI1MSA1NS44Mzg5SDMwLjY5NTNWMjUuMzIzOEw1NS4yNzc5IDQ3LjA0NzZWNy43MjkyMkw3LjcyMjUxIDcuNzE1NTlWNTUuODM4OVoiIGZpbGw9IndoaXRlIi8+PC9zdmc+&logoColor=white&labelColor=0a0a0a)](https://neon.tech)
 
-[![Azure Deploy](https://custom-icon-badges.demolab.com/github/actions/workflow/status/hua0-richard/gpu-store/ci-cd.yml?style=flat&label=Azure+Deploy&logo=msazure&logoColor=white&labelColor=0a0a0a&color=0078D4)](https://github.com/hua0-richard/gpu-store/actions/workflows/ci-cd.yml)
+[![Azure Deploy](https://custom-icon-badges.demolab.com/github/actions/workflow/status/hua0-richard/gpu-store/ci-cd.yml?style=flat&label=Azure+Deploy&logo=msazure&logoColor=white&labelColor=0a0a0a)](https://github.com/hua0-richard/gpu-store/actions/workflows/ci-cd.yml)
 
 [![Redis](https://img.shields.io/badge/Azure_Cache-Redis-DC382D?style=flat&logo=redis&logoColor=white&labelColor=0a0a0a)](https://azure.microsoft.com/products/cache)
 
