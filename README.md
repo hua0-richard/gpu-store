@@ -13,6 +13,8 @@ Full-stack compute billing platform with Stripe payments, JWT auth, webhook proc
 
 ## Demo Access
 
+Log in with the test account to explore the full purchase flow without a real payment.
+
 > Test account
 
 | Field    | Value              |
@@ -23,6 +25,8 @@ Full-stack compute billing platform with Stripe payments, JWT auth, webhook proc
 ---
 
 ## Architecture
+
+Next.js frontend on Vercel, NestJS API on Azure Container Apps, PostgreSQL (Neon) for persistence, and Redis for distributed locking.
 
 ```mermaid
 %%{init: {
@@ -114,6 +118,8 @@ flowchart LR
 
 ## Stack
 
+Technologies used across the frontend, backend, and infrastructure.
+
 | Layer         | Technology                                |
 | ------------- | ----------------------------------------- |
 | Frontend      | Next.js, shadcn/ui, TypeScript            |
@@ -126,6 +132,8 @@ flowchart LR
 
 ## Features
 
+What the app does end-to-end.
+
 - JWT auth with refresh token rotation and multi-session support
 - Shopping cart with Stripe Checkout
 - Webhook-driven payment lifecycle with signature verification and idempotency
@@ -134,7 +142,33 @@ flowchart LR
 
 ---
 
+## Key Engineering Highlights
+
+- **Duplicate webhook protection with Redis locking** — Stripe can deliver the same payment event more than once. To prevent double-charging or double-provisioning, each event claims an atomic Redis lock on arrival. If the lock is already held, the duplicate is dropped.
+
+- **Payment state driven by webhooks, not redirects** — A checkout redirect only means the user left Stripe's page not that the payment went through. Orders and GPU instances are created only after receiving and verifying a signed webhook from Stripe, so the system reacts to what actually happened.
+
+- **Refresh tokens hashed before storage** — Long-lived refresh tokens are stored as bcrypt hashes rather than plaintext, so a leaked database doesn't expose usable credentials. Same approach as password storage.
+
+---
+
+## Dev Tooling
+
+Monorepo managed with pnpm workspaces. Linting, formatting, and tests run across both apps via root-level scripts.
+
+| Tool          | Purpose                                                    |
+| ------------- | ---------------------------------------------------------- |
+| pnpm          | Package manager and workspace orchestration                |
+| ESLint 9      | Linting with TypeScript-aware rules (flat config)          |
+| Prettier      | Code formatting, enforced via lint-staged on commit        |
+| Husky         | Pre-commit hook — runs lint-staged before every commit     |
+| GitHub Actions | CI pipeline: lint → build → Docker push → Azure deploy   |
+
+---
+
 ## Local Development
+
+Runs fully in Docker. Stripe CLI is needed to test payment webhooks locally.
 
 ### Prerequisites
 
@@ -142,6 +176,8 @@ flowchart LR
 - [Stripe CLI](https://stripe.com/docs/stripe-cli) (for local webhook testing)
 
 ### Quick Start
+
+Starts the full stack and seeds the database with sample data.
 
 ```bash
 docker compose up
@@ -151,11 +187,15 @@ pnpm db:seed:dev
 
 ### Stripe Webhooks
 
+Forwards Stripe events to your local API so the payment flow works end-to-end.
+
 ```bash
 stripe listen --forward-to localhost:3001/webhooks/stripe
 ```
 
 ### Test Card
+
+Use this card number to complete a payment in test mode.
 
 ```
 ╔═══════════════════════════════════════╗
