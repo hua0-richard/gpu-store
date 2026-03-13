@@ -18,9 +18,9 @@
   "license": "ISC",
   "packageManager": "pnpm@10.15.0",
   "lint-staged": {
-    "apps/api/**/*.ts": "eslint --fix",
-    "apps/web/**/*.{ts,tsx}": "eslint --fix",
-    "**/*.{ts,tsx,js,json,md}": "prettier --write"
+    "apps/api/**/*.ts": "pnpm --filter api exec eslint --fix",
+    "apps/web/**/*.{ts,tsx}": "pnpm --filter web exec eslint --fix",
+    "**/*.{ts,tsx,js,json,md}": "pnpm exec prettier --write"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
