@@ -1,10 +1,6 @@
-# Compute Billing Platform
+# GPU Store
 
-Production-grade full-stack application featuring secure authentication, Stripe payments, background jobs, and modern frontend architecture.
-
----
-
-## Deployment Status
+Full-stack compute billing platform with Stripe payments, JWT auth, webhook processing, and Redis-backed distributed locking.
 
 [![Vercel Status](https://img.shields.io/github/deployments/hua0-richard/gpu-store/Production?label=Vercel&logo=vercel&logoColor=white&style=flat&labelColor=0a0a0a)](https://vercel.com)
 [![Azure Deploy](https://custom-icon-badges.demolab.com/github/actions/workflow/status/hua0-richard/gpu-store/ci-cd.yml?style=flat&label=Azure+Deploy&logo=msazure&logoColor=white&labelColor=0a0a0a)](https://github.com/hua0-richard/gpu-store/actions/workflows/ci-cd.yml)
@@ -12,8 +8,6 @@ Production-grade full-stack application featuring secure authentication, Stripe 
 [![Azure Cache](https://img.shields.io/endpoint?url=https%3A%2F%2Fgpu-store-api.gentlemoss-10838ef4.eastus2.azurecontainerapps.io%2Fhealth-check%2Fbadge%2Fredis&style=flat&v=1&logo=redis&logoColor=white&labelColor=0a0a0a)](https://azure.microsoft.com/products/cache)
 
 ---
-
-## Demo
 
 ![Demo screenshot](demo.png)
 
@@ -109,9 +103,7 @@ flowchart LR
     linkStyle default stroke:#94a3b8,stroke-width:1.5px
 ```
 
----
-
-## Tech Stack
+## Stack
 
 | Layer         | Technology                                |
 | ------------- | ----------------------------------------- |
@@ -123,24 +115,13 @@ flowchart LR
 | Hosting       | Vercel (web), Azure Container Apps (API)  |
 | CI/CD         | GitHub Actions → Azure Container Registry |
 
----
+## Features
 
-## Core Features
-
-- User authentication with JWT access tokens and refresh token rotation
+- JWT auth with refresh token rotation and multi-session support
 - Shopping cart with Stripe Checkout
-- Webhook-driven payment lifecycle (signature verification + idempotency)
-- Redis-backed distributed locking for payment events
-- Background job processing with BullMQ
-
----
-
-## Key Engineering Highlights
-
-- Designed **token-based auth** with refresh tokens and multi-session support
-- Enforced **clear service boundaries** in a NestJS modular architecture
-- Used **Prisma migrations** for safe schema evolution
-- Built **CI/CD pipeline** with GitHub Actions, Docker, and Azure Container Apps
+- Webhook-driven payment lifecycle with signature verification and idempotency
+- Redis distributed locking for concurrent payment events
+- Prisma migrations for schema evolution
 
 ---
 
@@ -167,11 +148,12 @@ stripe listen --forward-to localhost:3001/webhooks/stripe
 
 ### Test Card
 
-Use the following Stripe test card to complete a payment:
-
-| Field       | Value                          |
-| ----------- | ------------------------------ |
-| Card number | `4242 4242 4242 4242`          |
-| Expiry      | Any future date (e.g. `12/34`) |
-| CVC         | Any 3 digits (e.g. `123`)      |
-| ZIP         | Any (e.g. `12345`)             |
+```
+╔═══════════════════════════════════════╗
+║  STRIPE TEST BANK                VISA ║
+║  ▓▓▓ ))                               ║
+║  4242   4242   4242   4242            ║
+║  TEST CARDHOLDER   VALID  CVC  ZIP    ║
+║                    12/34  123  12345  ║
+╚═══════════════════════════════════════╝
+```
