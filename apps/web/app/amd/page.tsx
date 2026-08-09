@@ -7,7 +7,9 @@ export default function AmdPage() {
   const gpus = useCatalogData().gpuData.amd;
   return (
     <GpuCatalogPage
-      title="AMD GPUs"
+      eyebrow="AMD"
+      title="Instinct accelerators"
+      description="CDNA accelerators with up to 288GB of HBM3E memory per GPU."
       gpus={gpus}
       basePath="/amd/config"
     />

@@ -51,7 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             throw new Error("Refresh failed");
           }
 
-          console.log("finished")
+          console.log("finished");
 
           res = await fetch("/api/auth/profile", {
             method: "GET",

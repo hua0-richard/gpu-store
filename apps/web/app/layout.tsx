@@ -17,8 +17,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Tensor",
-  description: "High performance GPU compute instances for all your needs.  ",
+  title: "Tensor — GPU compute by the hour",
+  description:
+    "Reserve enterprise-grade NVIDIA and AMD GPU compute by the hour, and deploy it in minutes.",
 };
 
 export default function RootLayout({
@@ -27,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
@@ -39,9 +40,7 @@ export default function RootLayout({
         >
           <CartProvider>
             <AuthProvider>
-              <ToastProvider>
-                {children}
-              </ToastProvider>
+              <ToastProvider>{children}</ToastProvider>
             </AuthProvider>
           </CartProvider>
         </ThemeProvider>

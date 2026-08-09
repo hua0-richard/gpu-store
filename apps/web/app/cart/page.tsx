@@ -1,188 +1,168 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Trash2, ArrowRight } from "lucide-react";
-import NavigationBar from "@/components/navigation-bar";
-import Footer from "@/components/footer";
-import { robotoMono } from "@/app/fonts";
-import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { ArrowRight, ShoppingBag, Trash2 } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+import { PageHeader, PageShell } from "@/components/page-shell";
+import { Skeleton } from "@/components/ui/skeleton";
 import { fetchWithAuth } from "@/lib/api";
 import { useCart } from "@/components/cart-context";
 import { useToast } from "@/components/toast-context";
 
 export default function CartPage() {
-  const { items, removeItem } = useCart();
+  const { items, removeItem, hydrated } = useCart();
   const { toast } = useToast();
 
-  const subtotal = items.reduce(
-    (acc, item) => acc + item.totalPrice,
-    0,
-  );
-  const tax = subtotal * 0.1; // 10% tax
+  const subtotal = items.reduce((acc, item) => acc + item.totalPrice, 0);
+  const tax = subtotal * 0.1;
   const total = subtotal + tax;
 
+  const checkout = async () => {
+    try {
+      if (items.length === 0) {
+        toast("Your cart is empty", "error");
+        return;
+      }
+      const res = await fetchWithAuth(`/checkout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items }),
+      });
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Checkout failed: ${res.status} ${errorText}`);
+      }
+      const { url } = await res.json();
+      window.location.href = url;
+    } catch (err: any) {
+      console.error(err);
+      toast(`Failed to start checkout: ${err.message}`, "error");
+    }
+  };
+
   return (
-    <div className="flex min-h-screen w-full flex-col font-sans dark:bg-black">
-      <div className="flex w-full flex-col items-center">
-        <div className="relative z-50 w-full max-w-7xl px-4 md:px-8">
-          <NavigationBar />
+    <PageShell>
+      <PageHeader
+        title="Cart"
+        description={
+          items.length > 0
+            ? `${items.length} configuration${items.length > 1 ? "s" : ""} ready to deploy`
+            : undefined
+        }
+      />
+
+      <div className="flex flex-col gap-10 lg:flex-row lg:gap-20">
+        <div className="flex-1">
+          {!hydrated ? (
+            <ul className="divide-y divide-border border-y border-border">
+              {[0, 1].map((row) => (
+                <li
+                  key={row}
+                  className="flex items-start justify-between gap-4 py-5"
+                >
+                  <div className="space-y-2.5">
+                    <Skeleton className="h-4 w-48" />
+                    <Skeleton className="h-3 w-56" />
+                  </div>
+                  <Skeleton className="h-4 w-16" />
+                </li>
+              ))}
+            </ul>
+          ) : items.length === 0 ? (
+            <div className="flex flex-col items-center gap-4 rounded-xl border border-border bg-card px-6 py-16 text-center">
+              <ShoppingBag className="size-5 text-muted-foreground" />
+              <div className="space-y-1.5">
+                <p className="text-[14px]">Your cart is empty</p>
+                <p className="text-[13px] text-muted-foreground">
+                  Configure a GPU cluster to get started.
+                </p>
+              </div>
+              <Button variant="outline" asChild className="mt-1">
+                <Link href="/nvidia">Browse GPUs</Link>
+              </Button>
+            </div>
+          ) : (
+            <ul className="divide-y divide-border border-y border-border">
+              {items.map((item) => (
+                <li
+                  key={item.id}
+                  className="flex items-start justify-between gap-4 py-5"
+                >
+                  <div className="min-w-0">
+                    <p className="text-[14px]">
+                      <span className="font-mono">{item.quantity}x</span>{" "}
+                      {item.name}
+                    </p>
+                    <p className="mt-1.5 font-mono text-[12px] text-muted-foreground">
+                      {item.cpus} vCPU · {item.storage}GB NVMe · {item.hours}h
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-4">
+                    <span className="font-mono text-[14px]">
+                      ${item.totalPrice.toFixed(2)}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => removeItem(item.id)}
+                      className="text-muted-foreground hover:text-destructive"
+                    >
+                      <Trash2 className="size-4" />
+                      <span className="sr-only">Remove</span>
+                    </Button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
-        <main className="flex w-full max-w-7xl flex-col gap-8 px-4 py-10 md:px-8 lg:flex-row">
-          {/* LEFT COLUMN - CART ITEMS */}
-          <div className="flex flex-1 flex-col gap-6">
-            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-              Shopping Cart
-            </h1>
+        <div className="w-full lg:w-[320px]">
+          <div className="rounded-xl border border-border bg-card p-6 lg:sticky lg:top-20">
+            <h2 className="eyebrow">Order summary</h2>
 
-            <div className="rounded-xl border border-border/60 bg-card/50 backdrop-blur-sm">
-              <Table>
-                <TableHeader>
-                  <TableRow className="hover:bg-transparent border-border/60">
-                    <TableHead className="w-[100px] pl-6">Product</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Quantity</TableHead>
-                    <TableHead className="text-right">Price</TableHead>
-                    <TableHead className="w-[50px] pr-6"></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {items.length === 0 ? (
-                    <TableRow className="hover:bg-transparent border-border/60">
-                      <TableCell colSpan={5} className="h-24 text-center">
-                        Your cart is empty.
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    items.map((item) => (
-                      <TableRow key={item.id} className="hover:bg-transparent border-border/60">
-                        <TableCell className="py-4 pl-6">
-                          <div className="relative w-16 h-16 bg-secondary rounded-md overflow-hidden flex items-center justify-center border border-border/50">
-                            <span className={cn("text-[10px] text-muted-foreground", robotoMono.className)}>
-                              IMG
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="font-medium h-full py-4">
-                          <span className="text-base">{item.quantity}x {item.name}</span>
-                          <div className="text-xs text-muted-foreground mt-1">
-                            {item.cpus} vCPUs • {item.storage}GB Storage • {item.hours} Hours
-                          </div>
-                          <div className={cn("text-xs text-muted-foreground md:hidden mt-1", robotoMono.className)}>
-                            ${item.totalPrice.toFixed(2)}
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-4">
-                          <span className={cn("text-sm", robotoMono.className)}>{item.quantity}</span>
-                        </TableCell>
-                        <TableCell className={cn("text-right py-4 text-sm font-medium", robotoMono.className)}>
-                          ${item.totalPrice.toFixed(2)}
-                        </TableCell>
-                        <TableCell className="py-4 pr-6">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => removeItem(item.id)}
-                            className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                            <span className="sr-only">Remove</span>
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
+            <div className="mt-5 space-y-2.5 text-[13px]">
+              <div className="flex items-baseline justify-between">
+                <span className="text-muted-foreground">Subtotal</span>
+                {hydrated ? (
+                  <span className="font-mono">${subtotal.toFixed(2)}</span>
+                ) : (
+                  <Skeleton className="h-3 w-16" />
+                )}
+              </div>
+              <div className="flex items-baseline justify-between">
+                <span className="text-muted-foreground">Tax (10%)</span>
+                {hydrated ? (
+                  <span className="font-mono">${tax.toFixed(2)}</span>
+                ) : (
+                  <Skeleton className="h-3 w-14" />
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* RIGHT COLUMN - SUMMARY */}
-          <div className="w-full lg:w-[360px]">
-            <div className="lg:sticky lg:top-8">
-              <Card className="border border-border/60 shadow-none bg-card/50 backdrop-blur-sm">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-xl font-medium">Order Summary</CardTitle>
-                  <CardDescription>Review your total before checkout</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-muted-foreground">Subtotal</span>
-                      <span className={cn("font-medium", robotoMono.className)}>${subtotal.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-muted-foreground">Tax</span>
-                      <span className={cn("font-medium", robotoMono.className)}>${tax.toLocaleString()}</span>
-                    </div>
-                  </div>
-
-                  <div className="h-px w-full bg-border/50" />
-
-                  <div className="flex justify-between items-end pt-2">
-                    <span className="text-base font-medium">Total</span>
-                    <span className={cn("text-2xl font-semibold tracking-tight text-primary", robotoMono.className)}>
-                      ${total.toLocaleString()}
-                    </span>
-                  </div>
-                </CardContent>
-                <CardFooter className="pt-2 pb-6">
-                  <Button
-                    onClick={async () => {
-                      try {
-                        console.log("Checking out with items:", items);
-                        if (items.length === 0) {
-                          toast("Your cart is empty", "error");
-                          return;
-                        }
-                        const res = await fetchWithAuth(`/checkout`, {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ items }),
-                        });
-                        if (!res.ok) {
-                          const errorText = await res.text();
-                          throw new Error(`Checkout failed: ${res.status} ${errorText}`);
-                        }
-                        const { url } = await res.json();
-                        window.location.href = url;
-                      } catch (err: any) {
-                        console.error(err);
-                        toast(`Failed to start checkout: ${err.message}`, "error");
-                      }
-                    }}
-                    className="w-full h-11 text-base font-medium tracking-wide group rounded-md"
-                  >
-                    Checkout
-                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </Button>
-                </CardFooter>
-              </Card>
+            <div className="mt-5 flex items-baseline justify-between border-t border-border pt-5">
+              <span className="text-[13px] text-muted-foreground">Total</span>
+              {hydrated ? (
+                <span className="font-mono text-[22px] leading-none">
+                  ${total.toFixed(2)}
+                </span>
+              ) : (
+                <Skeleton className="h-4 w-28" />
+              )}
             </div>
-          </div>
-        </main>
 
-        <div className="w-full max-w-7xl px-4 md:px-8 mt-auto">
-          <Footer />
+            <Button
+              onClick={checkout}
+              disabled={!hydrated || items.length === 0}
+              className="group mt-6 w-full"
+            >
+              Checkout
+              <ArrowRight className="transition-transform group-hover:translate-x-0.5" />
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }
