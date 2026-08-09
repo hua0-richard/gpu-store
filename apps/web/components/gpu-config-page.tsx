@@ -2,398 +2,314 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Check, Clock, Cpu, HardDrive, LayoutGrid } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
-import NavigationBar from "@/components/navigation-bar";
-import Footer from "@/components/footer";
+import { PageShell } from "@/components/page-shell";
 import { cn } from "@/lib/utils";
-import { robotoMono } from "@/app/fonts";
 import { useCart } from "@/components/cart-context";
 import { useToast } from "@/components/toast-context";
 import { fetchWithAuth } from "@/lib/api";
 
 const CPU_OPTIONS = [
-    { value: 12, label: "12 vCPUs" },
-    { value: 24, label: "24 vCPUs" },
-    { value: 48, label: "48 vCPUs" },
-    { value: 96, label: "96 vCPUs" },
+  { value: 12, label: "12 vCPUs" },
+  { value: 24, label: "24 vCPUs" },
+  { value: 48, label: "48 vCPUs" },
+  { value: 96, label: "96 vCPUs" },
 ];
 
 const STORAGE_OPTIONS = [
-    { value: 100, label: "100GB NVMe" },
-    { value: 500, label: "500GB NVMe" },
-    { value: 1000, label: "1TB NVMe" },
-    { value: 2000, label: "2TB NVMe" },
+  { value: 100, label: "100GB NVMe" },
+  { value: 500, label: "500GB NVMe" },
+  { value: 1000, label: "1TB NVMe" },
+  { value: 2000, label: "2TB NVMe" },
 ];
 
 const QUANTITY_OPTIONS = [1, 2, 4, 8];
 
 interface GpuData {
-    name: string;
-    architecture: string;
-    memory: string;
-    memoryType?: string;
-    [key: string]: any;
+  name: string;
+  architecture: string;
+  memory: string;
+  memoryType?: string;
+  [key: string]: any;
 }
 
 interface GpuConfigPageProps {
-    gpu: GpuData | null | undefined;
-    gpuId: string;
-    pricingBase: Record<string, number>;
+  gpu: GpuData | null | undefined;
+  gpuId: string;
+  pricingBase: Record<string, number>;
+}
+
+function Section({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section>
+      <div className="flex items-baseline justify-between gap-4">
+        <h2 className="eyebrow">{label}</h2>
+        {hint && (
+          <span className="text-[12px] text-muted-foreground">{hint}</span>
+        )}
+      </div>
+      <div className="mt-4">{children}</div>
+    </section>
+  );
+}
+
+function OptionButton({
+  selected,
+  onClick,
+  children,
+}: {
+  selected: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={selected}
+      className={cn(
+        "rounded-lg border px-3 py-2.5 text-left text-[13px] transition-colors",
+        selected
+          ? "border-foreground/30 bg-secondary text-foreground"
+          : "border-border text-muted-foreground hover:border-foreground/20 hover:text-foreground",
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
+function SummaryRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-baseline justify-between gap-4 text-[13px]">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="font-mono">{value}</span>
+    </div>
+  );
 }
 
 export default function GpuConfigPage({
-    gpu,
-    gpuId,
-    pricingBase,
+  gpu,
+  gpuId,
+  pricingBase,
 }: GpuConfigPageProps) {
-    const [quantity, setQuantity] = useState(1);
-    const [cpus, setCpus] = useState(24);
-    const [storage, setStorage] = useState(500);
-    const [hours, setHours] = useState(24);
-    const { addItem } = useCart();
-    const { toast } = useToast();
+  const [quantity, setQuantity] = useState(1);
+  const [cpus, setCpus] = useState(24);
+  const [storage, setStorage] = useState(500);
+  const [hours, setHours] = useState(24);
+  const { addItem } = useCart();
+  const { toast } = useToast();
 
-    const hourlyRate = useMemo(() => {
-        const base = pricingBase[gpuId] || pricingBase.default || 3.00;
-        const cpuCost = cpus * 0.05;
-        const storageCost = storage * 0.001;
-        return (base * quantity) + cpuCost + storageCost;
-    }, [gpuId, quantity, cpus, storage, pricingBase]);
+  const hourlyRate = useMemo(() => {
+    const base = pricingBase[gpuId] || pricingBase.default || 3.0;
+    const cpuCost = cpus * 0.05;
+    const storageCost = storage * 0.001;
+    return base * quantity + cpuCost + storageCost;
+  }, [gpuId, quantity, cpus, storage, pricingBase]);
 
-    const totalCost = hourlyRate * hours;
+  const totalCost = hourlyRate * hours;
 
-    if (!gpu) {
-        return (
-            <div className="flex min-h-screen w-full flex-col items-center justify-center font-sans">
-                <div className="text-center">
-                    <h1 className="text-2xl font-bold mb-4">GPU Configuration Not Found</h1>
-                    <Link href="/">
-                        <Button>Return Home</Button>
-                    </Link>
-                </div>
-            </div>
-        );
-    }
-
+  if (!gpu) {
     return (
-        <div className="flex min-h-screen w-full justify-center font-sans dark:bg-black">
-            <main className="flex min-h-screen w-full max-w-7xl flex-col items-start justify-start bg-white px-4 dark:bg-black md:px-8">
-                <div className="w-full mb-16 md:mb-24">
-                    <NavigationBar />
-                </div>
-
-                <div className="flex w-full flex-col gap-10 lg:flex-row mb-16">
-                    {/* LEFT COLUMN - CONFIGURATION */}
-                    <div className="flex flex-1 flex-col gap-10">
-                        {/* Header */}
-                        <div className="space-y-6">
-                            <h1 className="text-5xl font-bold tracking-tighter sm:text-6xl">
-                                Configure {gpu.name}
-                            </h1>
-
-                            {/* Visual Datasheet Hero */}
-                            <div className="aspect-[2/1] w-full max-w-xl relative flex flex-col items-stretch overflow-hidden rounded-md border border-zinc-200 bg-zinc-50 dark:border-white/10 dark:bg-zinc-900/50">
-                                {/* Header: Architecture */}
-                                <div className="flex w-full items-center justify-between border-b border-zinc-200 px-4 py-3 dark:border-white/10">
-                                    <div className="flex items-center gap-2">
-                                        <div className="h-1.5 w-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600" />
-                                        <span className={`text-[10px] font-semibold text-zinc-500 uppercase tracking-widest ${robotoMono.className}`}>
-                                            {gpu.architecture}
-                                        </span>
-                                    </div>
-                                    <div className={`text-[10px] font-semibold text-zinc-400 uppercase tracking-widest ${robotoMono.className}`}>
-                                        High Performance Compute
-                                    </div>
-                                </div>
-
-                                {/* Body: VRAM Hero (w/ Dot Pattern) */}
-                                <div className="relative flex flex-1 flex-col items-center justify-center">
-                                    {/* Abstract Dot Pattern */}
-                                    <div className="absolute inset-0 z-0 opacity-30 dark:opacity-20 pointer-events-none">
-                                        <div
-                                            className="absolute inset-0 bg-[radial-gradient(#00000040_1px,transparent_1px)] dark:bg-[radial-gradient(#ffffff40_1px,transparent_1px)]"
-                                            style={{ backgroundSize: '16px 16px' }}
-                                        />
-                                    </div>
-
-                                    <div className="relative z-10 flex flex-col items-center gap-2">
-                                        <span className={`text-6xl font-bold tracking-tighter text-zinc-900 dark:text-white ${robotoMono.className}`}>
-                                            {gpu.memory.split(' ')[0]}
-                                        </span>
-                                        <span className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">
-                                            {gpu.memory.split(' ').slice(1).join(' ') || 'VRAM'}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                {/* Footer: Power & Bandwidth */}
-                                <div className="grid w-full grid-cols-2 divide-x divide-zinc-200 border-t border-zinc-200 dark:divide-white/10 dark:border-white/10">
-                                    <div className="flex flex-col items-center justify-center py-3">
-                                        <span className="text-[10px] font-medium text-zinc-400 uppercase">Power</span>
-                                        <span className={`text-sm font-semibold text-zinc-700 dark:text-zinc-300 ${robotoMono.className}`}>
-                                            {gpu.power || 'N/A'}
-                                        </span>
-                                    </div>
-                                    <div className="flex flex-col items-center justify-center py-3">
-                                        <span className="text-[10px] font-medium text-zinc-400 uppercase">Bandwidth</span>
-                                        <span className={`text-sm font-semibold text-zinc-700 dark:text-zinc-300 ${robotoMono.className}`}>
-                                            {gpu.memoryBandwidth || 'N/A'}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="h-px w-full bg-border" />
-
-                        {/* Quantity Section */}
-                        <section className="space-y-4">
-                            <div className="flex items-center gap-2">
-                                <LayoutGrid className="h-4 w-4 text-primary" />
-                                <h2 className="text-sm font-medium tracking-wide uppercase text-muted-foreground">GPU Quantity</h2>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                                {QUANTITY_OPTIONS.map((opt) => (
-                                    <div
-                                        key={opt}
-                                        onClick={() => setQuantity(opt)}
-                                        className={cn(
-                                            "cursor-pointer rounded-lg border p-4 text-center transition-all duration-300",
-                                            quantity === opt
-                                                ? "border-primary bg-secondary"
-                                                : "border-border/60 bg-transparent hover:bg-secondary/50"
-                                        )}
-                                    >
-                                        <div className={cn("text-2xl font-medium", robotoMono.className)}>
-                                            {opt}x
-                                        </div>
-                                        <div className="text-[10px] text-muted-foreground uppercase tracking-widest mt-1 font-medium">
-                                            GPUS
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-
-                        {/* vCPU Section */}
-                        <section className="space-y-4">
-                            <div className="flex items-center gap-2">
-                                <Cpu className="h-4 w-4 text-muted-foreground" />
-                                <h2 className="text-sm font-medium tracking-wide uppercase text-muted-foreground">vCPU Cores</h2>
-                            </div>
-                            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                                {CPU_OPTIONS.map((opt) => (
-                                    <div
-                                        key={opt.value}
-                                        onClick={() => setCpus(opt.value)}
-                                        className={cn(
-                                            "relative cursor-pointer rounded-lg border p-3 transition-all duration-300",
-                                            cpus === opt.value
-                                                ? "border-primary bg-secondary"
-                                                : "border-border/60 bg-transparent hover:bg-secondary/50"
-                                        )}
-                                    >
-                                        <div className="font-medium text-sm">{opt.label}</div>
-                                        {cpus === opt.value && (
-                                            <div className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-primary" />
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-
-                        {/* Storage Section */}
-                        <section className="space-y-4">
-                            <div className="flex items-center gap-2">
-                                <HardDrive className="h-4 w-4 text-muted-foreground" />
-                                <h2 className="text-sm font-medium tracking-wide uppercase text-muted-foreground">Storage</h2>
-                            </div>
-                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                                {STORAGE_OPTIONS.map((opt) => (
-                                    <div
-                                        key={opt.value}
-                                        onClick={() => setStorage(opt.value)}
-                                        className={cn(
-                                            "flex cursor-pointer items-center justify-between rounded-lg border p-3 transition-all duration-300",
-                                            storage === opt.value
-                                                ? "border-primary bg-secondary"
-                                                : "border-border/60 bg-transparent hover:bg-secondary/50"
-                                        )}
-                                    >
-                                        <span className="font-medium text-sm">{opt.label}</span>
-                                        {storage === opt.value && <Check className="h-3.5 w-3.5 text-primary" />}
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-
-                        {/* Duration Section */}
-                        <section className="space-y-6">
-                            <div className="flex items-center gap-3">
-                                <Clock className="h-5 w-5 text-muted-foreground" />
-                                <h2 className="text-lg font-medium tracking-wide uppercase text-muted-foreground">Duration</h2>
-                            </div>
-                            <div className="rounded-lg border border-border/60 p-6">
-                                <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                                    <input
-                                        type="range"
-                                        min="1"
-                                        max="168"
-                                        value={hours}
-                                        onChange={(e) => setHours(Number(e.target.value))}
-                                        className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-secondary accent-primary"
-                                    />
-                                    <div className={cn("w-24 text-right text-2xl font-medium", robotoMono.className)}>
-                                        {hours}h
-                                    </div>
-                                </div>
-                                <p className="mt-2 text-xs text-muted-foreground">
-                                    Drag to adjust duration. Max 1 week (168 hours).
-                                </p>
-                            </div>
-                        </section>
-                    </div>
-
-                    {/* RIGHT COLUMN - SUMMARY */}
-                    <div className="w-full lg:w-[360px]">
-                        <div className="sticky top-8">
-                            <Card className="relative overflow-hidden border border-zinc-200 bg-white shadow-none transition-all duration-500 dark:border-white/10 dark:bg-zinc-900/50">
-                                {/* Abstract Background Pattern */}
-                                <div className="absolute inset-0 z-0 opacity-40 pointer-events-none">
-                                    <div
-                                        className="absolute inset-0 bg-[radial-gradient(#00000040_1px,transparent_1px)] dark:bg-[radial-gradient(#ffffff40_1px,transparent_1px)]"
-                                        style={{ backgroundSize: '24px 24px' }}
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-white via-white/80 to-transparent dark:from-black dark:via-zinc-950/80" />
-                                </div>
-
-                                {/* Brand/Product Highlight Glow */}
-                                <div
-                                    className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-zinc-900/5 blur-3xl transition-all duration-700 dark:bg-white/5 pointer-events-none"
-                                />
-
-                                <div className="relative z-10">
-                                    <CardHeader className="pb-4">
-                                        <CardTitle className="text-xl font-medium">Summary</CardTitle>
-                                        <CardDescription>Estimated cost breakdown</CardDescription>
-                                    </CardHeader>
-                                    <CardContent className="space-y-4">
-                                        {/* Items List */}
-                                        <div className="space-y-3">
-                                            <div className="flex justify-between items-center text-sm">
-                                                <span className="text-muted-foreground">GPU Model</span>
-                                                <span className="font-medium">{quantity}x {gpu.name}</span>
-                                            </div>
-                                            <div className="flex justify-between items-center text-sm">
-                                                <span className="text-muted-foreground">Processor</span>
-                                                <span className="font-medium">{cpus} vCPUs</span>
-                                            </div>
-                                            <div className="flex justify-between items-center text-sm">
-                                                <span className="text-muted-foreground">Storage</span>
-                                                <span className="font-medium">{storage} GB NVMe</span>
-                                            </div>
-                                            <div className="flex justify-between items-center text-sm">
-                                                <span className="text-muted-foreground">Duration</span>
-                                                <span className="font-medium">{hours} Hours</span>
-                                            </div>
-                                        </div>
-
-                                        <div className="h-px w-full bg-border/50" />
-
-                                        {/* Pricing */}
-                                        <div className="space-y-1 pt-1">
-                                            <div className="flex justify-between items-end">
-                                                <span className="text-xs text-muted-foreground">Hourly Rate</span>
-                                                <span className={cn("text-lg font-medium", robotoMono.className)}>
-                                                    ${hourlyRate.toFixed(2)}
-                                                </span>
-                                            </div>
-                                            <div className="flex justify-between items-end mt-4">
-                                                <span className="text-base font-medium">Total Estimated</span>
-                                                <span className={cn("text-3xl font-semibold tracking-tight text-primary", robotoMono.className)}>
-                                                    ${totalCost.toFixed(2)}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                    <CardFooter className="pt-2 pb-6 flex flex-col gap-3">
-                                        <Button
-                                            onClick={async () => {
-                                                try {
-                                                    const res = await fetchWithAuth(`/checkout`, {
-                                                        method: "POST",
-                                                        headers: { "Content-Type": "application/json" },
-                                                        body: JSON.stringify({
-                                                            items: [{
-                                                                name: gpu.name,
-                                                                gpuId,
-                                                                quantity,
-                                                                cpus,
-                                                                storage,
-                                                                hours,
-                                                                pricePerStep: hourlyRate,
-                                                                architecture: gpu.architecture,
-                                                                memory: gpu.memory,
-                                                            }]
-                                                        }),
-                                                    });
-                                                    if (!res.ok) {
-                                                        const errorText = await res.text();
-                                                        throw new Error(`Checkout failed: ${res.status} ${errorText}`);
-                                                    }
-                                                    const { url } = await res.json();
-                                                    window.location.href = url;
-                                                } catch (err: any) {
-                                                    console.error(err);
-                                                    toast(`Failed to start checkout: ${err.message}`, "error");
-                                                }
-                                            }}
-                                            className="w-full h-11 text-base font-medium tracking-wide group rounded-md"
-                                        >
-                                            Deploy Cluster
-                                            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                                        </Button>
-                                        <Button
-                                            variant="outline"
-                                            onClick={() => {
-                                                addItem({
-                                                    name: gpu.name,
-                                                    gpuId,
-                                                    quantity,
-                                                    cpus,
-                                                    storage,
-                                                    hours,
-                                                    pricePerStep: hourlyRate,
-                                                    totalPrice: totalCost,
-                                                    architecture: gpu.architecture,
-                                                    memory: gpu.memory,
-                                                });
-                                                toast("Added to Cart!", "success");
-                                            }}
-                                            className="w-full h-11 text-base font-medium tracking-wide rounded-md"
-                                        >
-                                            Add to Cart
-                                        </Button>
-                                    </CardFooter>
-                                </div>
-                            </Card>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="w-full mt-auto">
-                    <Footer />
-                </div>
-            </main>
+      <PageShell>
+        <div className="max-w-sm space-y-4 py-10">
+          <h1 className="text-subtitle">Configuration not found</h1>
+          <p className="text-[15px] leading-relaxed text-muted-foreground">
+            We could not find a GPU matching this address.
+          </p>
+          <Button variant="outline" asChild>
+            <Link href="/">Return home</Link>
+          </Button>
         </div>
+      </PageShell>
     );
+  }
+
+  return (
+    <PageShell>
+      <div className="flex flex-col gap-14 lg:flex-row lg:gap-20">
+        <div className="flex-1">
+          <p className="eyebrow">{gpu.architecture}</p>
+          <h1 className="text-subtitle mt-4">{gpu.name}</h1>
+
+          <dl className="mt-8 flex flex-wrap gap-x-12 gap-y-4 border-y border-border py-5">
+            {[
+              { label: "Memory", value: gpu.memory },
+              { label: "Bandwidth", value: gpu.memoryBandwidth || "N/A" },
+              { label: "Power", value: gpu.power || "N/A" },
+            ].map((spec) => (
+              <div key={spec.label}>
+                <dt className="eyebrow">{spec.label}</dt>
+                <dd className="mt-1.5 font-mono text-[13px]">{spec.value}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <div className="mt-12 space-y-10">
+            <Section label="GPU quantity">
+              <div className="grid grid-cols-4 gap-2">
+                {QUANTITY_OPTIONS.map((opt) => (
+                  <OptionButton
+                    key={opt}
+                    selected={quantity === opt}
+                    onClick={() => setQuantity(opt)}
+                  >
+                    <span className="font-mono">{opt}x</span>
+                  </OptionButton>
+                ))}
+              </div>
+            </Section>
+
+            <Section label="vCPU cores">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {CPU_OPTIONS.map((opt) => (
+                  <OptionButton
+                    key={opt.value}
+                    selected={cpus === opt.value}
+                    onClick={() => setCpus(opt.value)}
+                  >
+                    {opt.label}
+                  </OptionButton>
+                ))}
+              </div>
+            </Section>
+
+            <Section label="Storage">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {STORAGE_OPTIONS.map((opt) => (
+                  <OptionButton
+                    key={opt.value}
+                    selected={storage === opt.value}
+                    onClick={() => setStorage(opt.value)}
+                  >
+                    {opt.label}
+                  </OptionButton>
+                ))}
+              </div>
+            </Section>
+
+            <Section label="Duration" hint="Up to 168 hours">
+              <div className="flex items-center gap-5">
+                <input
+                  type="range"
+                  min="1"
+                  max="168"
+                  value={hours}
+                  onChange={(e) => setHours(Number(e.target.value))}
+                  aria-label="Duration in hours"
+                  className="range-slider w-full cursor-pointer"
+                />
+                <span className="w-14 shrink-0 text-right font-mono text-[15px]">
+                  {hours}h
+                </span>
+              </div>
+            </Section>
+          </div>
+        </div>
+
+        <div className="w-full lg:w-[320px]">
+          <div className="rounded-xl border border-border bg-card p-6 lg:sticky lg:top-20">
+            <h2 className="eyebrow">Summary</h2>
+
+            <div className="mt-5 space-y-2.5">
+              <SummaryRow
+                label="GPU"
+                value={`${quantity}x ${gpuId.toUpperCase()}`}
+              />
+              <SummaryRow label="Processor" value={`${cpus} vCPU`} />
+              <SummaryRow label="Storage" value={`${storage} GB`} />
+              <SummaryRow label="Duration" value={`${hours} h`} />
+              <SummaryRow
+                label="Hourly rate"
+                value={`$${hourlyRate.toFixed(2)}`}
+              />
+            </div>
+
+            <div className="mt-5 flex items-baseline justify-between border-t border-border pt-5">
+              <span className="text-[13px] text-muted-foreground">
+                Total estimate
+              </span>
+              <span className="font-mono text-[22px] leading-none">
+                ${totalCost.toFixed(2)}
+              </span>
+            </div>
+
+            <div className="mt-6 flex flex-col gap-2">
+              <Button
+                className="group w-full"
+                onClick={async () => {
+                  try {
+                    const res = await fetchWithAuth(`/checkout`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        items: [
+                          {
+                            name: gpu.name,
+                            gpuId,
+                            quantity,
+                            cpus,
+                            storage,
+                            hours,
+                            pricePerStep: hourlyRate,
+                            architecture: gpu.architecture,
+                            memory: gpu.memory,
+                          },
+                        ],
+                      }),
+                    });
+                    if (!res.ok) {
+                      const errorText = await res.text();
+                      throw new Error(
+                        `Checkout failed: ${res.status} ${errorText}`,
+                      );
+                    }
+                    const { url } = await res.json();
+                    window.location.href = url;
+                  } catch (err: any) {
+                    console.error(err);
+                    toast(`Failed to start checkout: ${err.message}`, "error");
+                  }
+                }}
+              >
+                Deploy cluster
+                <ArrowRight className="transition-transform group-hover:translate-x-0.5" />
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => {
+                  addItem({
+                    name: gpu.name,
+                    gpuId,
+                    quantity,
+                    cpus,
+                    storage,
+                    hours,
+                    pricePerStep: hourlyRate,
+                    totalPrice: totalCost,
+                    architecture: gpu.architecture,
+                    memory: gpu.memory,
+                  });
+                  toast("Added to cart", "success");
+                }}
+              >
+                Add to cart
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </PageShell>
+  );
 }

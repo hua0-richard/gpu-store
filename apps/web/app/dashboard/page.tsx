@@ -1,152 +1,186 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Power, Server, Terminal } from "lucide-react";
+
 import { useAuth } from "@/components/auth-context";
 import { fetchWithAuth } from "@/lib/api";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
-import NavigationBar from "@/components/navigation-bar";
-import Footer from "@/components/footer";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { Terminal, Circle, Power, Link as LinkIcon, Server } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { robotoMono } from "@/app/fonts";
+import { PageHeader, PageShell } from "@/components/page-shell";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/toast-context";
 
 interface Instance {
-    id: string;
-    name: string;
-    type: string;
-    status: string;
-    ipAddress: string | null;
-    region: string;
-    createdAt: string;
+  id: string;
+  name: string;
+  type: string;
+  status: string;
+  ipAddress: string | null;
+  region: string;
+  createdAt: string;
+}
+
+function DetailRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-baseline justify-between gap-4 border-t border-border py-2.5">
+      <span className="text-[13px] text-muted-foreground">{label}</span>
+      <span className="font-mono text-[13px]">{value}</span>
+    </div>
+  );
+}
+
+function InstanceSkeleton() {
+  return (
+    <div className="rounded-xl border border-border bg-card p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div className="space-y-2">
+          <Skeleton className="h-3.5 w-32" />
+          <Skeleton className="h-3 w-20" />
+        </div>
+        <Skeleton className="h-5 w-16 rounded-full" />
+      </div>
+      <div className="mt-6 space-y-4">
+        <Skeleton className="h-3 w-full" />
+        <Skeleton className="h-3 w-full" />
+      </div>
+      <div className="mt-6 flex gap-2">
+        <Skeleton className="h-8 flex-1 rounded-lg" />
+        <Skeleton className="size-8 rounded-lg" />
+      </div>
+    </div>
+  );
 }
 
 export default function DashboardPage() {
-    const { isAuthenticated, loading } = useAuth();
-    const router = useRouter();
-    const [instances, setInstances] = useState<Instance[]>([]);
-    const { toast } = useToast();
+  const { isAuthenticated, loading } = useAuth();
+  const router = useRouter();
+  const [instances, setInstances] = useState<Instance[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const { toast } = useToast();
 
-    // Fetch instances on mount and poll every 5 seconds
-    useEffect(() => {
-        if (!loading && !isAuthenticated) {
-            router.replace("/login");
-            return;
-        }
+  // Fetch instances on mount and poll every 5 seconds
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.replace("/login");
+      return;
+    }
 
-        if (isAuthenticated) {
-            const fetchInstances = () => {
-                fetchWithAuth(`/instances`)
-                    .then(res => res.json())
-                    .then(data => {
-                        if (Array.isArray(data)) {
-                            setInstances(data);
-                        }
-                    })
-                    .catch(console.error);
-            };
+    if (isAuthenticated) {
+      const fetchInstances = () => {
+        fetchWithAuth(`/instances`)
+          .then((res) => res.json())
+          .then((data) => {
+            if (Array.isArray(data)) {
+              setInstances(data);
+            }
+          })
+          .catch(console.error)
+          .finally(() => setLoaded(true));
+      };
 
-            fetchInstances();
-            const interval = setInterval(fetchInstances, 5000); // Poll for simulation updates
-            return () => clearInterval(interval);
-        }
-    }, [isAuthenticated, loading, router]);
+      fetchInstances();
+      const interval = setInterval(fetchInstances, 5000); // Poll for simulation updates
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated, loading, router]);
 
-    const copyToClipboard = (text: string) => {
-        navigator.clipboard.writeText(text);
-        toast("Copied SSH command", "info");
-    };
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast("Copied SSH command", "info");
+  };
 
-    if (loading) return null;
+  return (
+    <PageShell>
+      <PageHeader
+        title="Clusters"
+        description="Manage your active GPU instances."
+      />
 
-    return (
-        <div className="flex min-h-screen w-full justify-center font-sans dark:bg-black">
-            <main className="flex min-h-screen w-full max-w-7xl flex-col items-start justify-start bg-white px-4 dark:bg-black md:px-8">
-                <div className="w-full mb-10 md:mb-16">
-                    <NavigationBar />
-                </div>
-
-                <div className="w-full mb-16 gap-10 flex flex-col">
-                    <div className="flex flex-col gap-4 mb-4">
-                        <h1 className="text-5xl font-bold tracking-tighter">Cluster Dashboard</h1>
-                        <p className="text-muted-foreground text-lg">Manage your active GPU instances.</p>
-                    </div>
-
-                    {instances.length === 0 ? (
-                        <Card className="bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800">
-                            <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
-                                <Server className="h-12 w-12 text-zinc-300 dark:text-zinc-700" />
-                                <h3 className="text-xl font-medium">No Active Instances</h3>
-                                <p className="text-muted-foreground">Purchase a GPU configuration to see it here.</p>
-                                <Button onClick={() => router.push('/')} variant="outline">Browse GPUs</Button>
-                            </CardContent>
-                        </Card>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {instances.map((instance) => (
-                                <Card key={instance.id} className="relative overflow-hidden bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 transition-all hover:shadow-lg">
-                                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 to-fuchsia-500 opacity-50" />
-
-                                    <CardHeader className="pb-3">
-                                        <div className="flex justify-between items-start">
-                                            <div className="flex flex-col gap-1">
-                                                <CardTitle className={cn("text-lg font-mono", robotoMono.className)}>{instance.name}</CardTitle>
-                                                <CardDescription className="uppercase text-xs font-semibold tracking-wider">{instance.type}</CardDescription>
-                                            </div>
-                                            <div className={cn(
-                                                "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium uppercase tracking-wider border",
-                                                instance.status === 'RUNNING'
-                                                    ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
-                                                    : "bg-amber-500/10 text-amber-500 border-amber-500/20"
-                                            )}>
-                                                <Circle className={cn("h-1.5 w-1.5 fill-current animate-pulse")} />
-                                                {instance.status}
-                                            </div>
-                                        </div>
-                                    </CardHeader>
-
-                                    <CardContent className="space-y-4 pb-4">
-                                        <div className="grid grid-cols-2 gap-4 text-sm">
-                                            <div>
-                                                <span className="text-xs text-muted-foreground uppercase">Region</span>
-                                                <div className="font-medium">{instance.region}</div>
-                                            </div>
-                                            <div>
-                                                <span className="text-xs text-muted-foreground uppercase">IP Address</span>
-                                                <div className={cn("font-medium font-mono", robotoMono.className)}>
-                                                    {instance.ipAddress || "Assigning..."}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </CardContent>
-
-                                    <CardFooter className="pt-2 flex gap-3">
-                                        <Button
-                                            size="sm"
-                                            variant="outline"
-                                            className="flex-1 gap-2 text-xs"
-                                            disabled={!instance.ipAddress}
-                                            onClick={() => copyToClipboard(`ssh root@${instance.ipAddress}`)}
-                                        >
-                                            <Terminal className="h-3.5 w-3.5" />
-                                            SSH
-                                        </Button>
-                                        <Button size="sm" variant="ghost" className="px-3 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20">
-                                            <Power className="h-4 w-4" />
-                                        </Button>
-                                    </CardFooter>
-                                </Card>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
-                <div className="w-full mt-auto">
-                    <Footer />
-                </div>
-            </main>
+      {loading || !loaded ? (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[0, 1, 2].map((card) => (
+            <InstanceSkeleton key={card} />
+          ))}
         </div>
-    );
+      ) : instances.length === 0 ? (
+        <div className="flex flex-col items-center gap-4 rounded-xl border border-border bg-card px-6 py-16 text-center">
+          <Server className="size-5 text-muted-foreground" />
+          <div className="space-y-1.5">
+            <p className="text-[14px]">No active instances</p>
+            <p className="text-[13px] text-muted-foreground">
+              Purchase a GPU configuration to see it here.
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            className="mt-1"
+            onClick={() => router.push("/nvidia")}
+          >
+            Browse GPUs
+          </Button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {instances.map((instance) => (
+            <div
+              key={instance.id}
+              className="rounded-xl border border-border bg-card p-5"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="truncate font-mono text-[13px]">
+                    {instance.name}
+                  </p>
+                  <p className="mt-1 text-[12px] text-muted-foreground">
+                    {instance.type}
+                  </p>
+                </div>
+                <Badge
+                  variant={
+                    instance.status === "RUNNING" ? "success" : "warning"
+                  }
+                  className="shrink-0 lowercase"
+                >
+                  {instance.status}
+                </Badge>
+              </div>
+
+              <div className="mt-5">
+                <DetailRow label="Region" value={instance.region} />
+                <DetailRow
+                  label="IP address"
+                  value={instance.ipAddress || "Assigning…"}
+                />
+              </div>
+
+              <div className="mt-5 flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="flex-1"
+                  disabled={!instance.ipAddress}
+                  onClick={() =>
+                    copyToClipboard(`ssh root@${instance.ipAddress}`)
+                  }
+                >
+                  <Terminal />
+                  SSH
+                </Button>
+                <Button
+                  size="icon-sm"
+                  variant="ghost"
+                  aria-label="Stop instance"
+                  className="text-muted-foreground hover:text-destructive"
+                >
+                  <Power className="size-4" />
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </PageShell>
+  );
 }

@@ -1,31 +1,83 @@
-import { robotoMono } from "@/app/fonts";
+import Link from "next/link";
+
+import { LogoMark } from "@/components/logo";
+import { GUTTER } from "@/components/layout";
+
+const SECTIONS = [
+  {
+    title: "Compute",
+    links: [
+      { label: "NVIDIA", href: "/nvidia" },
+      { label: "AMD", href: "/amd" },
+      { label: "Pricing", href: "/#pricing" },
+      { label: "Dashboard", href: "/dashboard" },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { label: "About", href: "#" },
+      { label: "Blog", href: "#" },
+      { label: "Careers", href: "#" },
+      { label: "Contact", href: "#" },
+    ],
+  },
+  {
+    title: "Resources",
+    links: [
+      { label: "Documentation", href: "#" },
+      { label: "Status", href: "#" },
+      { label: "Changelog", href: "#" },
+      { label: "Support", href: "#" },
+    ],
+  },
+];
 
 export default function Footer() {
   return (
-    <div
-      className={`w-full flex flex-col md:flex-row justify-start gap-8 items-start py-16 text-sm ${robotoMono.className}`}
-    >
-      <div className="w-full md:w-[400px] flex flex-col gap-2">
-        <h1 className="px-2 py-2 font-semibold text-zinc-900 dark:text-white">About</h1>
-        <hr className="border-border"></hr>
-        <div className="group cursor-pointer px-2 py-2 text-zinc-500 transition-all duration-300 hover:tracking-wide hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white">
-          <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">Discover</span>
+    <footer className={`border-t border-border py-14 md:py-16 ${GUTTER}`}>
+      <div className="flex flex-col gap-12 md:flex-row md:justify-between">
+        <div className="max-w-[15rem] space-y-3">
+          <div className="flex items-center gap-2">
+            <LogoMark />
+            <span className="text-[15px] font-medium tracking-[-0.03em]">
+              tensor
+            </span>
+          </div>
+          <p className="text-[13px] leading-relaxed text-muted-foreground">
+            GPU compute for training, inference, and everything in between.
+          </p>
         </div>
-        <div className="group cursor-pointer px-2 py-2 text-zinc-500 transition-all duration-300 hover:tracking-wide hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white">
-          <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">About</span>
-        </div>
-        <div className="group cursor-pointer px-2 py-2 text-zinc-500 transition-all duration-300 hover:tracking-wide hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white">
-          <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">Company</span>
+
+        <div className="grid grid-cols-2 gap-x-10 gap-y-10 sm:grid-cols-3 md:gap-x-20">
+          {SECTIONS.map((section) => (
+            <div key={section.title}>
+              <h2 className="eyebrow">{section.title}</h2>
+              <ul className="mt-4 space-y-3">
+                {section.links.map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
+                      className="text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </div>
 
-      <div className="w-full md:w-[400px] flex flex-col gap-2">
-        <h1 className="px-2 py-2 font-semibold text-zinc-900 dark:text-white">Product</h1>
-        <hr className="border-border"></hr>
-        <div className="group cursor-pointer px-2 py-2 text-zinc-500 transition-all duration-300 hover:tracking-wide hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white">
-          <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">Disclaimer</span>
-        </div>
+      <div className="mt-14 flex items-center justify-between gap-4 border-t border-border pt-6">
+        <p className="text-xs text-muted-foreground">
+          © {new Date().getFullYear()} Tensor
+        </p>
+        <p className="text-xs text-muted-foreground">
+          Demo project — not a real compute provider.
+        </p>
       </div>
-    </div>
+    </footer>
   );
 }

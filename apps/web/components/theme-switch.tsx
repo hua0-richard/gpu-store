@@ -1,39 +1,58 @@
 "use client";
 
-import { Moon, Sun } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 
-export function ModeToggle() {
-  const { setTheme } = useTheme();
+const OPTIONS = [
+  { value: "light", label: "Light", icon: Sun },
+  { value: "dark", label: "Dark", icon: Moon },
+  { value: "system", label: "System", icon: Monitor },
+];
+
+export function ThemeSwitch({ size = "md" }: { size?: "sm" | "md" }) {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  // The resolved theme is only known on the client, so nothing is marked
+  // active until then rather than briefly highlighting the wrong option.
+  useEffect(() => setMounted(true), []);
+
+  const compact = size === "sm";
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-          <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-          <span className="sr-only">Toggle theme</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          Light
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
-          Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
-          System
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div
+      role="group"
+      aria-label="Theme"
+      className={cn(
+        "inline-flex items-center rounded-full border border-border p-0.5",
+        compact ? "gap-0" : "gap-0.5",
+      )}
+    >
+      {OPTIONS.map((option) => {
+        const active = mounted && theme === option.value;
+
+        return (
+          <button
+            key={option.value}
+            type="button"
+            onClick={() => setTheme(option.value)}
+            aria-label={option.label}
+            aria-pressed={active}
+            className={cn(
+              "flex items-center justify-center rounded-full transition-colors",
+              compact ? "size-[22px]" : "size-6",
+              active
+                ? "bg-secondary text-foreground"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            <option.icon className={compact ? "size-3" : "size-3.5"} />
+          </button>
+        );
+      })}
+    </div>
   );
 }

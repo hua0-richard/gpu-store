@@ -1,29 +1,23 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRouter } from "next/navigation"
-import { useAuth, useSetAuth } from "@/components/auth-context";
+import { Logo } from "@/components/logo";
+import { ThemeSwitch } from "@/components/theme-switch";
+import { useSetAuth } from "@/components/auth-context";
 
 export default function Signup() {
   const router = useRouter();
-
+  const setAuth = useSetAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
-
-  const setAuth = useSetAuth();
 
   const canSubmit = email.trim().length > 0 && password.length > 0;
 
@@ -32,6 +26,7 @@ export default function Signup() {
 
     startTransition(async () => {
       try {
+        setError("");
         const res = await fetch("/signup/user", {
           method: "POST",
           headers: {
@@ -55,79 +50,94 @@ export default function Signup() {
             isAuthenticated: true,
             user: data.user,
             loading: false,
-          })
+          });
           router.push("/");
         }
       } catch (err) {
         console.error(err);
+        setError("We could not create that account. Try another email.");
       }
     });
   }
 
   return (
-    <div className="flex flex-col h-screen">
-      <div className="w-screen h-full flex items-center justify-center bg-background">
-        <Card className="w-full max-w-sm">
-          <CardHeader>
-            <CardTitle>Create an account</CardTitle>
-            <CardDescription>
-              Enter your email below to create your account
-            </CardDescription>
-          </CardHeader>
+    <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-5 py-16">
+      <Logo />
 
-          <CardContent>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleSignup();
-                  }}
-                />
-              </div>
+      <div className="w-full max-w-[368px] space-y-6 rounded-xl border border-border bg-card p-7">
+        <div className="space-y-1.5">
+          <h1 className="text-[19px] tracking-[-0.025em]">Create an account</h1>
+          <p className="text-[13px] text-muted-foreground">
+            Start deploying GPU clusters in minutes.
+          </p>
+        </div>
 
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                </div>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleSignup();
-                  }}
-                />
-              </div>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-[13px] font-normal">
+              Email
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="you@company.com"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSignup();
+              }}
+            />
+          </div>
 
-              <Button
-                type="button"
-                className="w-full"
-                onClick={handleSignup}
-                disabled={!canSubmit || isPending}
-              >
-                {isPending ? "Signing up…" : "Sign Up"}
-              </Button>
-            </div>
-          </CardContent>
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-[13px] font-normal">
+              Password
+            </Label>
+            <Input
+              id="password"
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSignup();
+              }}
+            />
+          </div>
 
-          <CardFooter className="flex flex-col gap-4">
-            <div className="text-center text-sm">
-              Already have an account?{" "}
-              <Button variant="link" className="p-0 h-auto" onClick={() => router.push("/login")}>
-                Login
-              </Button>
-            </div>
-          </CardFooter>
-        </Card>
+          {error && <p className="text-[13px] text-destructive">{error}</p>}
+
+          <Button
+            type="button"
+            className="w-full"
+            onClick={handleSignup}
+            disabled={!canSubmit || isPending}
+          >
+            {isPending ? "Creating account…" : "Create account"}
+          </Button>
+        </div>
+
+        <p className="text-center text-[13px] text-muted-foreground">
+          Already have an account?{" "}
+          <Link
+            href="/login"
+            className="text-foreground underline underline-offset-4"
+          >
+            Log in
+          </Link>
+        </p>
+      </div>
+
+      {/* These pages render no footer, so the theme control lives here. */}
+      <div className="flex items-center gap-5">
+        <Link
+          href="/"
+          className="text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+        >
+          Back to home
+        </Link>
+        <ThemeSwitch />
       </div>
     </div>
   );
