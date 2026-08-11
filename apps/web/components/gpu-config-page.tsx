@@ -107,6 +107,7 @@ export default function GpuConfigPage({
   const [cpus, setCpus] = useState(24);
   const [storage, setStorage] = useState(500);
   const [hours, setHours] = useState(24);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
   const { addItem } = useCart();
   const { toast } = useToast();
 
@@ -247,8 +248,11 @@ export default function GpuConfigPage({
             <div className="mt-6 flex flex-col gap-2">
               <Button
                 className="group w-full"
+                disabled={isCheckingOut}
                 onClick={async () => {
+                  if (isCheckingOut) return;
                   try {
+                    setIsCheckingOut(true);
                     const res = await fetchWithAuth(`/checkout`, {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
@@ -279,10 +283,11 @@ export default function GpuConfigPage({
                   } catch (err: any) {
                     console.error(err);
                     toast(`Failed to start checkout: ${err.message}`, "error");
+                    setIsCheckingOut(false);
                   }
                 }}
               >
-                Deploy cluster
+                {isCheckingOut ? "Starting checkout…" : "Deploy cluster"}
                 <ArrowRight className="transition-transform group-hover:translate-x-0.5" />
               </Button>
               <Button

@@ -89,6 +89,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
+  // Proactively renew the session well before the 30m access-token TTL
+  // expires, so a long client-side session (e.g. browsing multiple GPU
+  // configs between two checkouts) doesn't outlive the token and land the
+  // user back on /login the next time an API call 401s.
+  useEffect(() => {
+    if (!authState.isAuthenticated) return;
+
+    const REFRESH_INTERVAL_MS = 10 * 60 * 1000;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch("/refresh/user", {
+          method: "POST",
+          credentials: "include",
+          cache: "no-store",
+        });
+        if (!res.ok) {
+          throw new Error("Refresh failed");
+        }
+      } catch {
+        setAuthState({ isAuthenticated: false, user: null, loading: false });
+      }
+    }, REFRESH_INTERVAL_MS);
+
+    return () => clearInterval(interval);
+  }, [authState.isAuthenticated]);
+
   return (
     <AuthContext.Provider value={authState}>
       <SetAuthContext.Provider value={setAuthState}>

@@ -62,6 +62,8 @@ export class StripeController {
       },
     }));
 
+    const frontendUrl = (process.env.FRONTEND_URL ?? '').replace(/\/+$/, '');
+
     const session = await this.stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],
@@ -74,8 +76,8 @@ export class StripeController {
         },
       },
       line_items,
-      success_url: `${process.env.FRONTEND_URL}/account?success=true`,
-      cancel_url: `${process.env.FRONTEND_URL}/cart?canceled=true`,
+      success_url: `${frontendUrl}/account?success=true`,
+      cancel_url: `${frontendUrl}/cart?canceled=true`,
     });
 
     if (!session.url) {

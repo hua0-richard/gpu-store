@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, ShoppingBag, Trash2 } from "lucide-react";
 
@@ -13,17 +14,20 @@ import { useToast } from "@/components/toast-context";
 export default function CartPage() {
   const { items, removeItem, hydrated } = useCart();
   const { toast } = useToast();
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const subtotal = items.reduce((acc, item) => acc + item.totalPrice, 0);
   const tax = subtotal * 0.1;
   const total = subtotal + tax;
 
   const checkout = async () => {
+    if (isCheckingOut) return;
     try {
       if (items.length === 0) {
         toast("Your cart is empty", "error");
         return;
       }
+      setIsCheckingOut(true);
       const res = await fetchWithAuth(`/checkout`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -38,6 +42,7 @@ export default function CartPage() {
     } catch (err: any) {
       console.error(err);
       toast(`Failed to start checkout: ${err.message}`, "error");
+      setIsCheckingOut(false);
     }
   };
 
@@ -154,10 +159,10 @@ export default function CartPage() {
 
             <Button
               onClick={checkout}
-              disabled={!hydrated || items.length === 0}
+              disabled={!hydrated || items.length === 0 || isCheckingOut}
               className="group mt-6 w-full"
             >
-              Checkout
+              {isCheckingOut ? "Starting checkout…" : "Checkout"}
               <ArrowRight className="transition-transform group-hover:translate-x-0.5" />
             </Button>
           </div>
