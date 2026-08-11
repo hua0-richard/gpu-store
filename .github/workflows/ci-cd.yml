@@ -11,11 +11,6 @@ concurrency:
   group: ci-cd-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  ACR_REGISTRY: gpustoreacr.azurecr.io
-  CONTAINER_APP_NAME: gpu-store-api
-  RESOURCE_GROUP: gpu-store-rg
-
 jobs:
   ci:
     name: Lint and Build
@@ -73,23 +68,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Log in to Azure
-        if: matrix.service == 'api'
-        uses: azure/login@v2
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Log in to ACR
-        if: matrix.service == 'api'
-        run: az acr login --name gpustoreacr
-
       - name: Docker metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: |
             ghcr.io/${{ github.repository }}/${{ matrix.service }}
-            ${{ matrix.service == 'api' && 'gpustoreacr.azurecr.io/gpu-store-api' || '' }}
           tags: |
             type=sha
             type=ref,event=branch
@@ -105,22 +89,3 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           no-cache: true
-
-  deploy:
-    name: Deploy to Azure Container Apps
-    runs-on: ubuntu-latest
-    needs: docker
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    steps:
-      - name: Log in to Azure
-        uses: azure/login@v2
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Deploy to Container Apps
-        run: |
-          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-          az containerapp update \
-            --name ${{ env.CONTAINER_APP_NAME }} \
-            --resource-group ${{ env.RESOURCE_GROUP }} \
-            --image ${{ env.ACR_REGISTRY }}/gpu-store-api:sha-${SHORT_SHA}
