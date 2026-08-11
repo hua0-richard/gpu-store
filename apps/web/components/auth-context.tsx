@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           cache: "no-store",
         });
 
-        if (res.status === 401) {
+        if (!res.ok) {
           const refreshRes = await fetch("/refresh/user", {
             method: "POST",
             credentials: "include",
@@ -50,8 +50,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (!refreshRes.ok) {
             throw new Error("Refresh failed");
           }
-
-          console.log("finished");
 
           res = await fetch("/api/auth/profile", {
             method: "GET",

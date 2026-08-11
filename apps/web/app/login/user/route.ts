@@ -55,7 +55,7 @@ export async function POST(req: Request) {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: 60 * 5,
+    maxAge: 60 * 30,
   });
 
   (await cookies()).set("refresh", refreshToken, {
