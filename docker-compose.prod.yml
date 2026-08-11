@@ -1,0 +1,86 @@
+version: "3.9"
+
+# Locally-hosted backend for a Vercel-deployed frontend.
+#
+# Vercel (Hobby - no Secure Compute) -> public internet (HTTPS) -> Tailscale Funnel -> ts-api sidecar -> api -> postgres / redis
+#
+# The frontend (`web`) is deployed on Vercel as usual - it is NOT part of this
+# stack. `api` joins the tailnet via the ts-api sidecar (network_mode:
+# service:ts-api), which uses `tailscale funnel` to expose it over HTTPS at
+# https://<TS_HOSTNAME>.<tailnet>.ts.net. Vercel Hobby can't join the tailnet
+# directly (that needs Secure Compute, Pro/Enterprise only), so the API ends
+# up publicly reachable - CORS_ORIGIN below is the only thing restricting
+# who it talks to, so real auth/secrets matter. postgres/redis stay
+# internal-only regardless.
+
+services:
+  postgres:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.prod}
+      POSTGRES_DB: ecommerce
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+
+  api:
+    container_name: api
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile.prod
+    restart: unless-stopped
+    env_file:
+      - .env.prod.api
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.prod}@postgres:5432/ecommerce
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_URL: redis://redis:6379
+      # The Vercel deployment's origin, e.g. https://gpu-store.vercel.app
+      CORS_ORIGIN: ${WEB_ORIGIN:?set WEB_ORIGIN in .env.prod to your Vercel URL}
+      FRONTEND_URL: ${WEB_ORIGIN:?set WEB_ORIGIN in .env.prod to your Vercel URL}
+    # Shares ts-api's network namespace, so it's reachable wherever ts-api's
+    # `tailscale funnel` publishes it. No `ports:` here - exposure is
+    # entirely up to the sidecar.
+    network_mode: "service:ts-api"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      ts-api:
+        condition: service_started
+
+  ts-api:
+    image: tailscale/tailscale:latest
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    environment:
+      TS_AUTHKEY: ${TS_AUTHKEY:?set TS_AUTHKEY in .env.prod}
+      TS_HOSTNAME: ${TS_HOSTNAME:-gpu-store-api}
+    entrypoint: ["/bin/sh", "/entrypoint.sh"]
+    volumes:
+      - ts-api-data:/var/lib/tailscale
+      - ./tailscale/entrypoint.sh:/entrypoint.sh:ro
+
+volumes:
+  pgdata:
+  redisdata:
+  ts-api-data:

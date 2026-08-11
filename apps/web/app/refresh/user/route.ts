@@ -4,7 +4,10 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   const backend = process.env.SERVER_URL;
   if (!backend) {
-    return NextResponse.json({ message: "SERVER_URL missing" }, { status: 500 });
+    return NextResponse.json(
+      { message: "SERVER_URL missing" },
+      { status: 500 },
+    );
   }
   const cookieHeader = request.headers.get("cookie") ?? "";
 
@@ -29,7 +32,7 @@ export async function POST(request: Request) {
   if (!accessToken) {
     return NextResponse.json(
       { message: "Refresh response missing tokens" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -40,7 +43,7 @@ export async function POST(request: Request) {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: 20,
+    maxAge: 60 * 5,
   });
 
   return new NextResponse(null, { status: 204 });

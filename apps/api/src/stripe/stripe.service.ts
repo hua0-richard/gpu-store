@@ -46,7 +46,7 @@ export class StripeService {
           // Fetch line items to get details
           console.log('Fetching line items...');
           const lineItems = await new Stripe(process.env.STRIPE_SECRET_KEY!, {
-            apiVersion: '2025-12-15.clover', // Matches installed library version
+            apiVersion: '2026-07-29.dahlia', // Matches installed library version
           }).checkout.sessions.listLineItems(session.id, {
             expand: ['data.price.product'],
           });

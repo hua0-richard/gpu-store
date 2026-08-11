@@ -8,7 +8,7 @@ export async function POST(req: Request) {
   if (!baseUrl) {
     return NextResponse.json(
       { message: "SERVER_URL is not set" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -24,25 +24,29 @@ export async function POST(req: Request) {
     try {
       const err = await res.json();
       msg = err?.message ?? msg;
-    } catch { }
+    } catch {}
     return NextResponse.json({ message: msg }, { status: res.status });
   }
 
-  const data: { user: { email: string, name: string | null }, access_token?: string, refresh_token?: string } = await res.json();
+  const data: {
+    user: { email: string; name: string | null };
+    access_token?: string;
+    refresh_token?: string;
+  } = await res.json();
   const accessToken = data.access_token;
   const refreshToken = data.refresh_token;
 
   if (!accessToken) {
     return NextResponse.json(
       { message: "No access token returned from server" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
   if (!refreshToken) {
     return NextResponse.json(
       { message: "No refresh token returned from server" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -59,7 +63,7 @@ export async function POST(req: Request) {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: 24 * 60 * 60 * 1000,
+    maxAge: 10 * 24 * 60 * 60,
   });
 
   return NextResponse.json({ user: data.user });

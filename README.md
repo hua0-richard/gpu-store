@@ -17,10 +17,10 @@ Log in with the test account to explore the full purchase flow without a real pa
 
 > Test account
 
-| Field    | Value              |
-| -------- | ------------------ |
+| Field    | Value               |
+| -------- | ------------------- |
 | Email    | `demo@gpustore.dev` |
-| Password | `Demo1234!`        |
+| Password | `Demo1234!`         |
 
 ---
 
@@ -156,13 +156,13 @@ What the app does end-to-end.
 
 Monorepo managed with pnpm workspaces. Linting, formatting, and tests run across both apps via root-level scripts.
 
-| Tool          | Purpose                                                    |
-| ------------- | ---------------------------------------------------------- |
-| pnpm          | Package manager and workspace orchestration                |
-| ESLint 9      | Linting with TypeScript-aware rules (flat config)          |
-| Prettier      | Code formatting, enforced via lint-staged on commit        |
-| Husky         | Pre-commit hook — runs lint-staged before every commit     |
-| GitHub Actions | CI pipeline: lint → build → Docker push → Azure deploy   |
+| Tool           | Purpose                                                |
+| -------------- | ------------------------------------------------------ |
+| pnpm           | Package manager and workspace orchestration            |
+| ESLint 9       | Linting with TypeScript-aware rules (flat config)      |
+| Prettier       | Code formatting, enforced via lint-staged on commit    |
+| Husky          | Pre-commit hook — runs lint-staged before every commit |
+| GitHub Actions | CI pipeline: lint → build → Docker push → Azure deploy |
 
 ---
 
@@ -208,3 +208,65 @@ Use this card number to complete a payment in test mode.
 ║                    12/34  123  12345  ║
 ╚═══════════════════════════════════════╝
 ```
+
+---
+
+## Locally-Hosted API + Vercel Frontend (Tailscale)
+
+`web` keeps deploying to Vercel as usual. `api`, `postgres`, and `redis` run
+locally instead of on Azure/Neon. `api` joins the tailnet via a `ts-api`
+sidecar, which uses **Tailscale Funnel** to publish it over HTTPS at
+`https://<TS_HOSTNAME>.<your-tailnet>.ts.net`.
+
+Funnel rather than Secure Compute because Secure Compute needs a Vercel
+Pro/Enterprise plan — on Hobby, Vercel has no way to join a tailnet
+directly, so the API has to be reachable over the public internet like any
+other HTTPS API. `postgres`/`redis` stay internal-only either way.
+
+```
+Vercel (Hobby) → public internet (HTTPS) → Tailscale Funnel → ts-api sidecar → api → postgres / redis
+```
+
+Since the API is now genuinely public, `CORS_ORIGIN` (locked to your Vercel
+origin) is doing real security work here, not just browser politeness.
+
+### Local setup
+
+```bash
+cp .env.prod.example .env.prod
+cp .env.prod.api.example .env.prod.api
+# fill in POSTGRES_PASSWORD, TS_AUTHKEY, WEB_ORIGIN in .env.prod
+# fill in STRIPE_SECRET_KEY / STRIPE_WEBHOOK_SECRET in .env.prod.api
+
+docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build
+pnpm --filter api db:migrate:prod
+```
+
+`db:migrate:prod` runs `prisma migrate deploy` against the fresh Postgres —
+unlike `db:seed:dev`'s `prisma migrate dev`, it only applies existing
+migrations and won't prompt or generate new ones, which is what you want
+against a real database.
+
+Generate a reusable, tagged Tailscale auth key at
+[login.tailscale.com/admin/settings/keys](https://login.tailscale.com/admin/settings/keys)
+(not ephemeral — an ephemeral key drops the node on every restart), and make
+sure **Funnel** is enabled for your tailnet/node at
+[login.tailscale.com/admin/settings/funnel](https://login.tailscale.com/admin/settings/funnel).
+
+### Vercel-side setup
+
+In the `web` project's Vercel environment variables, set:
+
+```
+SERVER_URL=https://<TS_HOSTNAME>.<your-tailnet>.ts.net
+```
+
+(e.g. `https://gpu-store-api.tail1234.ts.net`) — this is what
+`next.config.ts`'s rewrite uses to reach the API, now resolving to your
+local machine over Funnel instead of Azure Container Apps.
+
+> [!NOTE]
+> `apps/api/src/auth/constants.ts` currently hardcodes the JWT signing
+> secret. That was low-stakes when the API only saw `localhost`; now that
+> it's genuinely public via Funnel, it's worth moving to an env-provided
+> secret before relying on this for anything sensitive.

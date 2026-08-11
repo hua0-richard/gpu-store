@@ -9,6 +9,7 @@
     "lint": "pnpm -r lint",
     "build": "pnpm -r build",
     "docker:up": "docker compose up",
+    "docker:build:prod": "docker compose -f docker-compose.prod.yml --env-file .env.prod build",
     "stripe:listen": "wait-on tcp:localhost:3001 && stripe login && stripe listen --forward-to=http://localhost:3001/webhooks/stripe",
     "run:dev": "concurrently -k -n DOCKER,STRIPE -c cyan,magenta npm:docker:up npm:stripe:listen",
     "prepare": "husky"
