@@ -242,6 +242,11 @@ docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build
 pnpm --filter api db:migrate:prod
 ```
 
+> **Note:** `--env-file .env.prod` is required. Docker Compose only
+> auto-loads a file literally named `.env`, so running `docker compose -f
+docker-compose.prod.yml up -d --build` without it will fail with "missing
+> env vars" errors even though `.env.prod` exists and is filled in.
+
 `db:migrate:prod` runs `prisma migrate deploy` against the fresh Postgres —
 unlike `db:seed:dev`'s `prisma migrate dev`, it only applies existing
 migrations and won't prompt or generate new ones, which is what you want
